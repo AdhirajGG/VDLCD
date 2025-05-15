@@ -37,13 +37,15 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   try {
     const machine = await prisma.machine.findUnique({
       where: { slug: params.slug },
-    });
+    })
+
     if (!machine) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
-    return NextResponse.json(machine, { status: 200 });
+
+    return NextResponse.json(machine, { status: 200 })
   } catch (error) {
-    console.error("[MACHINE_GET]", error); // Debug: remove in production
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+    console.error("[MACHINE_GET]", error)
+    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 })
   }
 }

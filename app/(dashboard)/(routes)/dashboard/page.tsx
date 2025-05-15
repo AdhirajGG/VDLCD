@@ -140,10 +140,11 @@ const DashboardPage = () => {
     }
   };
 
+ useEffect(() => {
   if (!user) {
     router.push("/sign-in");
-    return null;
   }
+}, [user]);
 
   return (
     <div className="p-6 space-y-8">
