@@ -39,6 +39,8 @@
 // }
 
 // export default MobileSidebar;
+
+// componnents/mobile-sidebar.tsx
 "use client"
 
 import {
@@ -52,9 +54,11 @@ import { Menu } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { useCart } from "@/components/cart-context"
 
 const MobileSidebar = () => {
     const [isMounted, setIsMounted] = useState(false);
+    const { cartItems } = useCart()
     
     useEffect(() => {
       setIsMounted(true)

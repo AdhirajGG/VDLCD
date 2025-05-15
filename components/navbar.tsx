@@ -1,3 +1,4 @@
+// components/navbar.tsx
 import { UserButton } from "@clerk/nextjs";
 import MobileSidebar from "@/components/mobile-sidebar";
 

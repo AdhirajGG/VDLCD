@@ -3,6 +3,9 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// prsma/schema.prisma
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -17,11 +20,24 @@ model Machine {
   id          Int      @id @default(autoincrement())
   slug        String   @unique
   model       String
-  price       String
+  price       String   // Change from Int to String
   image       String
   description String
   category    String
   specs       Json
-  
-  @@map("machines")
+
+   @@map("machines")
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+} 
+// prisma/schema.prisma
+model Order {
+  id          String   @id @default(uuid())
+  userId      String
+  items       Json
+  total       Float
+  createdAt   DateTime @default(now())
 }

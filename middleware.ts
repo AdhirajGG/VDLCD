@@ -12,12 +12,19 @@
 // };
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-const isPublicRoute = createRouteMatcher(['/','/sign-in(.*)','/sign-up(.*)']);
-
-export default clerkMiddleware(async(auth, req) => {
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/api/webhook/stripe',
+]);
+// If you want to declare an array of ignored routes, do it like this:
+const ignoredRoutes = ['/api/webhook/stripe'];
+export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
+  // Do NOT check for admin here unless your whole app is admin-only!
 });
 
 export const config = {
@@ -26,3 +33,4 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
+
