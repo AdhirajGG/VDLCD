@@ -388,7 +388,7 @@ export default function ProductDetailPage() {
               <Input
                 type="number"
                 min="0"
-                step="0.01"
+                step="1"
                 value={editData.price}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9.]/g, '');
