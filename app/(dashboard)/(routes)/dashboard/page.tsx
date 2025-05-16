@@ -1,6 +1,6 @@
-
 // app/(dashboard)/(routes)/dashboard/page.tsx
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -11,95 +11,107 @@ import { Plus } from "lucide-react";
 import { useMachines } from "@/components/machine";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
-
-
-
-function isValidImageUrl(url: string): boolean {
-  const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
-  if (url.startsWith("/") && imageExtensions.test(url)) return true;
-  try {
-    const parsedUrl = new URL(url);
-    return ["http:", "https:"].includes(parsedUrl.protocol) && imageExtensions.test(parsedUrl.pathname);
-  } catch {
-    return false;
-  }
-}
-
-type NewProductType = {
-  slug: string;
-  model: string;
-  price: string;
-  image: string;
-  description: string;
-  category: string;
-  specs: [string, string][];
-};
+import { motion } from "framer-motion";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { BarChart } from "@/components/ui/chart";
 
 const DashboardPage = () => {
   const router = useRouter();
-  const { machines, categories, addMachine, refreshCategories } = useMachines();
+  const { machines, categories, addMachine, refresh, refreshCategories } =
+    useMachines();
   const { user } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
-  const [newProduct, setNewProduct] = useState<NewProductType>({
+  const [newProduct, setNewProduct] = useState({
     slug: "",
     model: "",
-    price: "",
+    price: "0",
     image: "",
     description: "",
     category: categories[0]?.name || "",
-    specs: [],
+    specs: [] as [string, string][],
   });
 
+  // Only admins get access
   useEffect(() => {
-    // Check admin role from Clerk metadata
-    setIsAdmin(user?.publicMetadata?.role === "admin");
-  }, [user]);
+    if (!user) {
+      router.push("/sign-in");
+    } else {
+      setIsAdmin(user.publicMetadata.role === "admin");
+    }
+  }, [user, router]);
 
+  // Ensure product category default
   useEffect(() => {
     if (categories.length && !newProduct.category) {
-      setNewProduct((prev) => ({ ...prev, category: categories[0].name }));
+      setNewProduct((p) => ({ ...p, category: categories[0].name }));
     }
   }, [categories]);
 
-  const handleAddSpec = () => {
-    setNewProduct((prev) => ({
-      ...prev,
-      specs: [...prev.specs, ["", ""]],
-    }));
-  };
-
-  const handleSpecChange = (index: number, field: number, value: string) => {
-    const updatedSpecs = [...newProduct.specs];
-    updatedSpecs[index][field] = value;
-    setNewProduct((prev) => ({ ...prev, specs: updatedSpecs }));
-  };
-
-  const validateProduct = (): boolean => {
-    const requiredFields = ["slug", "model", "price", "image", "description"];
-    const missing = requiredFields.filter((field) => !newProduct[field as keyof NewProductType]);
-    if (missing.length > 0) {
-      toast.error("Please fill all required fields.");
-      return false;
+  // Category creation
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      toast.error("Category name cannot be empty");
+      return;
     }
-    if (!isValidImageUrl(newProduct.image)) {
-      toast.error("Invalid image URL format.");
-      return false;
-    }
-    return true;
-  };
-
-  const handleAddProduct = async () => {
-    if (!validateProduct()) return;
-
     try {
-      const specsObject: Record<string, string> = Object.fromEntries(newProduct.specs);
-      await addMachine({
-        ...newProduct,
-        specs: specsObject,
-      });
+      await axios.post("/api/categories", { name: newCategory.trim() });
+      toast.success("Category added!");
+      setNewCategory("");
+      setShowCategoryModal(false);
+      await refreshCategories();
+      await refresh();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to add category");
+    }
+  };
+
+  // Product creation
+  const handleAddProduct = async () => {
+    // basic validation
+    if (
+      !newProduct.slug ||
+      !newProduct.model ||
+      !newProduct.price ||
+      !newProduct.image ||
+      !newProduct.description
+    ) {
+      toast.error("Fill all product fields");
+      return;
+    }
+    // try {
+    //   const specsObj = Object.fromEntries(newProduct.specs);
+    //   await addMachine({ ...newProduct, specs: specsObj });
+    //   toast.success("Product added!");
+    //   setNewProduct({
+    //     slug: "",
+    //     model: "",
+    //     price: "",
+    //     image: "",
+    //     description: "",
+    //     category: categories[0]?.name || "",
+    //     specs: [],
+    //   });
+    //   setShowAddProductModal(false);
+    //   await refresh();
+    // } catch (err: any) {
+    //   const status = err.response?.status;
+    //   toast.error(
+    //     status === 409
+    //       ? "Product slug already exists"
+    //       : "Failed to add product"
+    //   );
+    // }
+    try {
+      const specsObj = Object.fromEntries(newProduct.specs);
+      await addMachine({ ...newProduct, specs: specsObj });
       toast.success("Product added!");
       setNewProduct({
         slug: "",
@@ -111,198 +123,298 @@ const DashboardPage = () => {
         specs: [],
       });
       setShowAddProductModal(false);
-    } catch (error: any) {
-      if (error?.response?.status === 409) {
-        toast.error("Product with this slug already exists!");
-      } else {
-        toast.error("Failed to add product.");
+      await refresh();
+    } catch (err: any) {
+      // Only show error if slug already exists
+      if (err.response?.status === 409) {
+        toast.error("Product slug already exists");
+      }
+      // Otherwise, just log it (no generic toast)
+      else {
+        console.error("Add product error:", err);
       }
     }
   };
-
-  const handleAddCategory = async () => {
-    if (!newCategory.trim()) {
-      toast.error("Category name cannot be empty");
-      return;
-    }
-    try {
-      await axios.post("/api/categories", { name: newCategory });
-      toast.success("Category added!");
-      setNewCategory("");
-      setShowCategoryModal(false);
-      refreshCategories();
-    } catch (error: any) {
-      if (error?.response?.status === 409) {
-        toast.error("Category already exists!");
-      } else {
-        toast.error("Failed to add category");
-      }
-    }
-  };
-
- useEffect(() => {
-  if (!user) {
-    router.push("/sign-in");
-  }
-}, [user]);
 
   return (
     <div className="p-6 space-y-8">
-      <Toaster />
+      <Toaster richColors />
+
+      {/* Header */}
       <header className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <motion.h1
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+        >
+          {isAdmin ? " (Admin)" : " (User)"} Dashboard
+        </motion.h1>
+
         {isAdmin && (
-          <Button
-            onClick={() => setShowAddProductModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            Add Product
-          </Button>
+            <Button
+              onClick={() => setShowAddProductModal(true)}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              Add Product
+            </Button>
+          </motion.div>
         )}
       </header>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">Recent Activity</h2>
-          <p className="text-gray-600">No recent activity</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">Statistics</h2>
-          <p className="text-gray-600">
-            Total products: <span className="font-bold">{machines?.length ?? 0}</span>
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
-          <div className="space-y-2">
-            {isAdmin && (
-              <Button
-                className="w-full bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
-                onClick={() => setShowCategoryModal(true)}
-              >
-                Add Category
-              </Button>
-            )}
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-lg">Total Products</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">
+                {machines.length}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-lg">Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">
+                {categories.length}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-lg">Sales Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BarChart data={machines.slice(0, 5)} />
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
+
+      {/* Quick Action: Add Category */}
+      {isAdmin && (
+        <div>
+          <Button
+            variant="outline"
+            onClick={() => setShowCategoryModal(true)}
+          >
+            Add Category
+          </Button>
+        </div>
+      )}
 
       {/* Add Product Modal */}
       {showAddProductModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">Add New Product</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <h2 className="text-xl font-bold mb-4">Add New Product</h2>
             <div className="space-y-4">
+              {/* Category */}
               <div>
-                <Label htmlFor="category">Category</Label>
+                <Label>Category</Label>
                 <select
-                  id="category"
                   value={newProduct.category}
-                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                  className="w-full border-gray-300 rounded-lg p-2"
+                  onChange={(e) =>
+                    setNewProduct((p) => ({
+                      ...p,
+                      category: e.target.value,
+                    }))
+                  }
+                  className="w-full border p-2 rounded-lg"
                 >
-                  {categories.map(category => (
-                    <option key={category.name} value={category.name}>
-                      {category.name}
+                  {categories.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name}
                     </option>
                   ))}
                 </select>
               </div>
+
+              {/* Slug / Model / Price / Image / Description */}
+              {["slug", "model", "image"].map((field) => (
+                <div key={field}>
+                  <Label className="capitalize">{field}</Label>
+                  <Input
+                    value={(newProduct as any)[field]}
+                    onChange={(e) =>
+                      setNewProduct((p) => ({
+                        ...p,
+                        [field]: e.target.value,
+                      }))
+                    }
+                    placeholder={`Enter ${field}`}
+                  />
+                </div>
+              ))}
+
               <div>
-                <Label htmlFor="slug">Slug</Label>
+                <Label>Price</Label>
                 <Input
-                  id="slug"
-                  value={newProduct.slug}
-                  onChange={(e) => setNewProduct({ ...newProduct, slug: e.target.value })}
-                  placeholder="e.g., vd-580-pd"
-                />
-              </div>
-              <div>
-                <Label htmlFor="model">Model</Label>
-                <Input
-                  id="model"
-                  value={newProduct.model}
-                  onChange={(e) => setNewProduct({ ...newProduct, model: e.target.value })}
-                  placeholder="e.g., VD-580-PD"
-                />
-              </div>
-              <div>
-                <Label htmlFor="price">Price</Label>
-                <Input
-                  id="price"
+                  type="number"
+                  min="0"
+                  step="1"
                   value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                  placeholder="e.g., $6,000.00"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9.]/g, '');
+                    const sanitizedValue = value.replace(/(\..*)\./g, '$1');
+                    setNewProduct(p => ({ ...p, price: sanitizedValue }));
+                  }}
+                  onKeyDown={(e) => {
+                    if (!/[0-9.]/.test(e.key) && e.key !== 'Backspace') {
+                      e.preventDefault();
+                    }
+                  }}
+                  placeholder="Enter price"
                 />
               </div>
+
+
               <div>
-                <Label htmlFor="image">Image URL</Label>
-                <Input
-                  id="image"
-                  value={newProduct.image}
-                  onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                  placeholder="e.g., /products/vd-580-pd.jpg"
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
+                <Label>Description</Label>
                 <textarea
-                  id="description"
                   value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  placeholder="Enter product description"
-                  className="w-full border-gray-300 rounded-lg p-2"
+                  onChange={(e) =>
+                    setNewProduct((p) => ({
+                      ...p,
+                      description: e.target.value,
+                    }))
+                  }
+                  className="w-full border p-2 rounded-lg"
                 />
               </div>
-              <div className="space-y-4">
-                {newProduct.specs.map((spec, index) => (
-                  <div key={index} className="flex gap-2">
+
+              {/* Specs */}
+              {/* <div className="space-y-2">
+                {newProduct.specs.map((spec, i) => (
+                  <div key={i} className="flex gap-2">
                     <Input
                       value={spec[0]}
-                      onChange={(e) => handleSpecChange(index, 0, e.target.value)}
-                      placeholder="Specification name"
+                      onChange={(e) => {
+                        const sp = [...newProduct.specs];
+                        sp[i][0] = e.target.value;
+                        setNewProduct((p) => ({ ...p, specs: sp }));
+                      }}
+                      placeholder="Spec name"
                     />
                     <Input
                       value={spec[1]}
-                      onChange={(e) => handleSpecChange(index, 1, e.target.value)}
-                      placeholder="Specification value"
+                      onChange={(e) => {
+                        const sp = [...newProduct.specs];
+                        sp[i][1] = e.target.value;
+                        setNewProduct((p) => ({ ...p, specs: sp }));
+                      }}
+                      placeholder="Spec value"
                     />
                   </div>
                 ))}
-                <Button onClick={handleAddSpec} className="gap-2">
-                  <Plus className="h-4 w-4" /> Add Specification
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setNewProduct((p) => ({
+                      ...p,
+                      specs: [...p.specs, ["", ""]],
+                    }))
+                  }
+                >
+                  <Plus className="mr-2" /> Add Spec
+                </Button>
+              </div> */}
+              <div className="space-y-2">
+                <div className="max-h-[300px] overflow-y-auto pr-2">
+                  {newProduct.specs.map((spec, i) => (
+                    <div key={i} className="flex gap-2 mb-2">
+                      <Input
+                        value={spec[0]}
+                        onChange={(e) => {
+                          const sp = [...newProduct.specs];
+                          sp[i][0] = e.target.value;
+                          setNewProduct((p) => ({ ...p, specs: sp }));
+                        }}
+                        placeholder="Spec name"
+                      />
+                      <Input
+                        value={spec[1]}
+                        onChange={(e) => {
+                          const sp = [...newProduct.specs];
+                          sp[i][1] = e.target.value;
+                          setNewProduct((p) => ({ ...p, specs: sp }));
+                        }}
+                        placeholder="Spec value"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setNewProduct(p => ({
+                    ...p,
+                    specs: [...p.specs, ["", ""]]
+                  }))}
+                  className="w-full"
+                >
+                  <Plus className="mr-2" /> Add Spec
                 </Button>
               </div>
+
             </div>
-            <div className="flex justify-end space-x-4">
+
+            <div className="mt-6 flex justify-end gap-4">
               <Button
+                variant="outline"
                 onClick={() => setShowAddProductModal(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
               >
                 Cancel
               </Button>
-              <Button
-                onClick={handleAddProduct}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-              >
-                Add Product
-              </Button>
+              <Button onClick={handleAddProduct}>Add Product</Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* Add Category Modal */}
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
+          >
             <h3 className="text-lg font-bold mb-4">Add New Category</h3>
             <Input
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Enter category name"
+              placeholder="Category name"
             />
-            <div className="flex justify-end gap-4 mt-4">
+            <div className="mt-4 flex justify-end gap-4">
               <Button
                 variant="outline"
                 onClick={() => setShowCategoryModal(false)}
@@ -311,7 +423,7 @@ const DashboardPage = () => {
               </Button>
               <Button onClick={handleAddCategory}>Add Category</Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

@@ -48,7 +48,7 @@ useEffect(() => {
             {cartItems.map(item => (
               <TableRow key={item.slug}>
                 <TableCell className="font-medium">{item.model}</TableCell>
-                <TableCell>${item.price.toFixed(2)}</TableCell>
+                <TableCell>${Number(item.price || 0).toFixed(2)}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
                 <TableCell>${(item.price * item.quantity).toFixed(2)}</TableCell>
                 <TableCell>
@@ -65,7 +65,7 @@ useEffect(() => {
         </Table>
         <div className="mt-6 flex justify-between items-center">
           <div className="text-xl font-bold">
-            Total: ${total.toFixed(2)}
+            Total: {Number(total || 0).toFixed(2)}
           </div>
           <div className="space-x-4">
             <Button

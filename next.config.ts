@@ -4,7 +4,12 @@ import type { NextConfig } from "next";
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["media.istockphoto.com"], // Add the hostname here
+    domains: [
+      "media.istockphoto.com",
+      'plus.unsplash.com',
+      "images.unsplash.com",
+      "media.gettyimages.com",
+    ], // Add the hostname here
   },
 };
 

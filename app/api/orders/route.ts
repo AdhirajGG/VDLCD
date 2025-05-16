@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   
   if (!userId) return NextResponse.json([], { status: 200 });
 
-  const orders = await prisma.Order.findMany({
+  const orders = await prisma.order.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' }
   });

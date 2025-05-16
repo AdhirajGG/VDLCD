@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
           product_data: {
             name: product!.model,
           },
-          unit_amount: Math.round(product!.price * 100),
+          unit_amount: Math.round(Number(product!.price) * 100),
         },
         quantity: item.quantity,
       };

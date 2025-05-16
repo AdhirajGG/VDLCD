@@ -87,22 +87,7 @@ export const useMachines = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // const fetchMachines = async (category?: string) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     const url = category
-  //       ? `/api/machines?category=${encodeURIComponent(category)}`
-  //       : '/api/machines';
-  //     const response = await axios.get(url);
-  //     setMachines(response.data);
-  //   } catch (error) {
-  //     console.error("Fetch machines error:", error);
-  //     setError("Failed to fetch machines. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
 
   const fetchMachines = async (category?: string) => {
     setLoading(true);
