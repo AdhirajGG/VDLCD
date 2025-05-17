@@ -351,38 +351,113 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
+// export function BarChart({
+//   data,
+//   dataKey = "price",
+//   nameKey = "model",
+// }: {
+//   data: any[];
+//   /** the field on each data item to render as the bar value */
+//   dataKey?: string;
+//   /** the field on each data item to use for the X axis */
+//   nameKey?: string;
+// }) {
+//   return (
+//     <ChartContainer
+//       id="bar-chart"
+//       config={{
+//         [dataKey]: { color: "#4ade80", label: dataKey },
+//         [nameKey]: {},
+//       }}
+//     >
+//       <RechartsPrimitive.BarChart
+//         data={data}
+//         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+//       >
+//         <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+//         <RechartsPrimitive.XAxis dataKey={nameKey} />
+//         <RechartsPrimitive.YAxis />
+//         <ChartTooltip content={<ChartTooltipContent />} />
+//         <ChartLegend content={<ChartLegendContent />} />
+//         <RechartsPrimitive.Bar
+//           dataKey={dataKey}
+//           name={dataKey}
+//           fill="color(--color-bar)"
+//         />
+//       </RechartsPrimitive.BarChart>
+//     </ChartContainer>
+//   )
+// }
 export function BarChart({
   data,
   dataKey = "price",
   nameKey = "model",
 }: {
   data: any[];
-  /** the field on each data item to render as the bar value */
   dataKey?: string;
-  /** the field on each data item to use for the X axis */
   nameKey?: string;
 }) {
+  const chartData = data.map(item => ({
+    [nameKey]: item[nameKey],
+    [dataKey]: parseFloat(item[dataKey])
+  }));
+
   return (
     <ChartContainer
       id="bar-chart"
       config={{
-        [dataKey]: { color: "#4ade80", label: dataKey },
-        [nameKey]: {},
+        [dataKey]: { color: "#4ade80", label: "Price (USD)" },
+        [nameKey]: { label: "Product Models" },
       }}
     >
       <RechartsPrimitive.BarChart
-        data={data}
-        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        data={chartData}
+        margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
       >
         <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
-        <RechartsPrimitive.XAxis dataKey={nameKey} />
-        <RechartsPrimitive.YAxis />
-        <ChartTooltip content={<ChartTooltipContent />} />
-        <ChartLegend content={<ChartLegendContent />} />
+        <RechartsPrimitive.XAxis 
+          dataKey={nameKey}
+          tick={(props) => {
+            const { x, y, payload } = props;
+            return (
+              <text
+                x={x}
+                y={y}
+                dy={16}
+                textAnchor="end"
+                fontSize={12}
+                transform={`rotate(-45, ${x}, ${y})`}
+                fill="#666"
+              >
+                {payload.value}
+              </text>
+            );
+          }}
+          interval={0}
+          height={80}  // Increased height for rotated labels
+        />
+        <RechartsPrimitive.YAxis 
+          tickFormatter={(value: number) => `$${value}`}
+          width={80}  // Set explicit width for price labels
+        />
+        <RechartsPrimitive.Tooltip 
+          formatter={(value: number) => `$${value.toFixed(2)}`}
+          contentStyle={{
+            backgroundColor: '#fff',
+            border: '1px solid #ddd',
+            borderRadius: '4px'
+          }}
+        />
+        <RechartsPrimitive.Legend />
         <RechartsPrimitive.Bar
           dataKey={dataKey}
-          name={dataKey}
-          fill="color(--color-bar)"
+          name="Product Prices"
+          fill="#4ade80"
+          label={{ 
+            position: 'top', 
+            formatter: (value: number) => `$${value}`,
+            fontSize: 12 
+          }}
         />
       </RechartsPrimitive.BarChart>
     </ChartContainer>

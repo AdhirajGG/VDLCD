@@ -66,18 +66,18 @@
 //         href: `/products/category/${formatCategorySlug(category)}`,
 //       })),
 //     },
-//     {
-//       label: "Cart",
-//       icon: CarTaxiFront,
-//       href: "/cart",
-//       color: "text-orange-300",
-//     },
-//     {
-//       label: "Orders",
-//       icon: ShoppingCart,
-//       href: "/orders",
-//       color: "text-violet-500",
-//     },
+    // {
+    //   label: "Cart",
+    //   icon: CarTaxiFront,
+    //   href: "/cart",
+    //   color: "text-orange-300",
+    // },
+    // {
+    //   label: "Orders",
+    //   icon: ShoppingCart,
+    //   href: "/orders",
+    //   color: "text-violet-500",
+    // },
 //     {
 //       label: "Settings",
 //       icon: Settings,
@@ -285,6 +285,7 @@ import {
   ChevronDown,
   ChevronUp,
   LayoutDashboard,
+  ListOrdered,
   Settings,
   ShoppingCart,
   Warehouse,
@@ -321,6 +322,12 @@ export default function Sidebar() {
       icon: ShoppingCart,
       href: "/cart",
       color: "text-orange-300",
+    },
+    {
+      label: "Orders",
+      icon: ListOrdered,
+      href: "/orders",
+      color: "text-violet-500",
     },
     {
       label: "Settings",

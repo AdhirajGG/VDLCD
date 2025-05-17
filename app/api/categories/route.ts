@@ -35,3 +35,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to add category" }, { status: 500 });
   }
 }
+
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    
+    const { name } = await req.json();
+    const updated = await prisma.category.update({
+      where: { id: Number(params.id) },
+      data: { name }
+    });
+    
+    return NextResponse.json(updated);
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to update category" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    
+    await prisma.category.delete({
+      where: { id: Number(params.id) }
+    });
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to delete category" }, { status: 500 });
+  }
+}
