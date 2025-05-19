@@ -15,25 +15,52 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ items: user?.cart?.items || [] });
 }
 
+// export async function POST(req: NextRequest) {
+//   const { userId } = await auth();
+//   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+//   const { items } = await req.json();
+  
+//   await prisma.user.upsert({
+//     where: { clerkId: userId },
+//     create: {
+//       clerkId: userId,
+//       cart: { create: { items } }
+//     },
+//     update: { 
+//       cart: { upsert: {
+//         create: { items },
+//         update: { items }
+//       }}
+//     }
+//   });
+
+//   return NextResponse.json({ success: true });
+// }
+
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { items } = await req.json();
   
-  await prisma.user.upsert({
+  // Update cart directly using nested update
+  const user = await prisma.user.upsert({
     where: { clerkId: userId },
     create: {
       clerkId: userId,
       cart: { create: { items } }
     },
-    update: { 
-      cart: { upsert: {
-        create: { items },
-        update: { items }
-      }}
-    }
+    update: {
+      cart: {
+        upsert: {
+          create: { items },
+          update: { items }
+        }
+      }
+    },
+    include: { cart: true }
   });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, cart: user.cart });
 }

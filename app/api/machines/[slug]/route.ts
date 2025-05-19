@@ -1,5 +1,5 @@
 
-// app/api/machines/[slug]/route.ts
+
 
 // import { NextRequest, NextResponse } from "next/server";
 // import prisma from "@/lib/prisma";
@@ -22,6 +22,7 @@
 //   }
 // }
 
+// app/api/machines/[slug]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { isAdmin } from "@/lib/clerkAdmin";

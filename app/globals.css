@@ -149,3 +149,15 @@
     --chart-5: 340 75% 55%;
   }
 }
+
+@layer utilities {
+  .text-stroke {
+    -webkit-text-stroke: 1px theme('colors.indigo.100');
+    text-stroke: 1px theme('colors.indigo.100');
+  }
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}

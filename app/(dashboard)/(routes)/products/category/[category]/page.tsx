@@ -1,4 +1,4 @@
-// // app/(dashboard)/(routes)/products/category/[category]/page.tsx
+// 
 // "use client";
 // import { useEffect } from "react";
 // import { useRouter, useParams } from "next/navigation";
@@ -269,6 +269,8 @@
 //     </div>
 //   );
 // }
+
+// app/(dashboard)/(routes)/products/category/[category]/page.tsx
 "use client";
 
 import { useEffect, useMemo } from "react";

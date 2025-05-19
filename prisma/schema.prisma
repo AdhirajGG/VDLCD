@@ -39,6 +39,7 @@ model User {
   clerkId   String   @unique
   cart      Cart?
   orders    Order[]
+  lastActiveAt DateTime @default(now())
 }
 
 model Cart {

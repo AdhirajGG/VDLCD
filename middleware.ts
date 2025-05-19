@@ -29,9 +29,9 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // Public routes (anyone can hit these)
 const isPublicRoute = createRouteMatcher([
   "/",              // home
-  "/products(.*)",  // all product‑listing or detail pages
   "/sign-in(.*)",   // sign-in (and any nested paths)
   "/sign-up(.*)",   // sign-up
+  "/cart(.*)",     // cart
 ]);
 
 // Any routes you explicitly want Clerk to ignore entirely
