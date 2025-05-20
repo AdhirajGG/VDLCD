@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
+// module.exports = {
+//   allowedDevOrigins: ['local-origin.dev', '*.local-origin.dev'],
+// }
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: import('next').NextConfig = {
   reactStrictMode: true,
   images: {
     domains: [

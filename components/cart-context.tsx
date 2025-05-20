@@ -41,6 +41,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
+
+
   // Load cart on mount
   // useEffect(() => {
   //   const loadCart = async () => {
@@ -155,7 +157,11 @@ useEffect(() => {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
-  };
+  }; 
+
+  const removeItemsBySlug = (slug: string) => {
+  setCartItems(prev => prev.filter(item => item.slug !== slug));
+}; 
 
   const updateQuantity = (slug: string, quantity: number) => {
     setCartItems(prev => {

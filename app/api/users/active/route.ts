@@ -8,7 +8,7 @@ export async function GET() {
     const activeUsers = await prisma.user.count({
       where: {
         lastActiveAt: {
-          gte: new Date(Date.now() - 30 * 60 * 1000)
+          gte: new Date(Date.now() - 10 * 60 * 1000)
         }
       }
     });

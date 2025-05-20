@@ -88,3 +88,24 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
     );
   }
 }
+
+// Add DELETE handler
+export async function DELETE(req: NextRequest, { params }: { params: { slug: string } }) {
+  try {
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await prisma.machine.delete({
+      where: { slug: params.slug }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("[MACHINE_DELETE]", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete machine" },
+      { status: 500 }
+    );
+  }
+}

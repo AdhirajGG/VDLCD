@@ -57,19 +57,9 @@ export default function Sidebar() {
       href: "/orders",
       color: "text-violet-500",
     },
-    {
-      label: "Settings",
-      icon: Settings,
-      href: "/settings",
-      color: "text-zinc-400",
-    },
   ];
 
-  // Keep categories fresh every 30s
-  // useEffect(() => {
-  //   const id = setInterval(() => refreshCategories(), 30_000);
-  //   return () => clearInterval(id);
-  // }, [refreshCategories]);
+
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-gray-900 to-gray-800 text-white py-4 space-y-4">

@@ -35,29 +35,35 @@ export async function GET(req: Request) {
     const { userId } = getAuth(req as any);
     
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Find the user in your database using Clerk's userId
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const orders = await prisma.order.findMany({
-      where: { userId },
+      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
         total: true,
         createdAt: true,
-        items: true
+        items: true,
+        paymentMethod: true
       }
     });
 
     return NextResponse.json(orders.map(order => ({
       ...order,
-      items: typeof order.items === "string"
-        ? JSON.parse(order.items)
-        : order.items ?? [],
-      createdAt: order.createdAt.toISOString()
+      createdAt: order.createdAt.toISOString(),
+      // Ensure items are properly parsed
+      items: typeof order.items === "string" ? JSON.parse(order.items) : order.items
     })));
   } catch (error) {
     console.error("[ORDERS_GET]", error);

@@ -427,7 +427,7 @@ export function BarChart({
                 textAnchor="end"
                 fontSize={12}
                 transform={`rotate(-45, ${x}, ${y})`}
-                fill="#666"
+                fill="#2dd4bf"
               >
                 {payload.value}
               </text>
@@ -443,7 +443,7 @@ export function BarChart({
         <RechartsPrimitive.Tooltip 
           formatter={(value: number) => `$${value.toFixed(2)}`}
           contentStyle={{
-            backgroundColor: '#fff',
+            backgroundColor: '#2dd4bf',
             border: '1px solid #ddd',
             borderRadius: '4px'
           }}
