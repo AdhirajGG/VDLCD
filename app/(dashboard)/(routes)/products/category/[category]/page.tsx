@@ -183,7 +183,7 @@
 //   );
 // }
 
-
+// app/dashboard/(routes)/products/category/[category]/page.tsx
 "use client";
 
 import { useEffect, useMemo } from "react";
@@ -361,6 +361,9 @@ export default function CategoryProductsPage() {
                     backgroundColor: colors.primary.main,
                     color: colors.text.primary
                   }}
+                  onClick={() =>
+                    router.push(`/checkout/${encodeURIComponent(product.slug)}`)
+                  }
                 >
                   Buy Now
                 </Button>

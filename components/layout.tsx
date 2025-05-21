@@ -15,9 +15,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
     };
     
-    // Update on mount and every 10 minutes
+    // Update on mount and every 1 minutes
     updateActivity();
-    const interval = setInterval(updateActivity, 10 * 60 * 1000);
+    const interval = setInterval(updateActivity, 1 * 60 * 1000);
     return () => clearInterval(interval);
   }, [user]);
 

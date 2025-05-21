@@ -15,6 +15,7 @@ type CartItem = {
 
 type CartContextType = {
   cartItems: CartItem[];
+   loading: boolean;
   addToCart: (item: Omit<CartItem, "quantity">) => void;
   removeFromCart: (slug: string) => void;
   updateQuantity: (slug: string, quantity: number) => void;
@@ -35,12 +36,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   //   }
   // };
 
-   const syncCart = useCallback(async (items: CartItem[]) => {
-    if (user) {
+  const syncCart = useCallback(async (items: CartItem[]) => {
+  if (user) {
+    try {
       await axios.post("/api/cart", { items });
+    } catch (error) {
+      console.error("Cart sync failed:", error);
+      // Optionally store locally if sync fails
+      localStorage.setItem("cart", JSON.stringify(items));
     }
-  }, [user]);
-
+  }
+}, [user]);
 
 
   // Load cart on mount
@@ -182,7 +188,7 @@ useEffect(() => {
 
  return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart }}
+      value={{ cartItems, loading: !initialized, addToCart, removeFromCart, updateQuantity, clearCart }}
     >
       {children}
     </CartContext.Provider>

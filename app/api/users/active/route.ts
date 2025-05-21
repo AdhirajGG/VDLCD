@@ -2,13 +2,13 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+
 export async function GET() {
   try {
-    // Example: Users active in last 30 minutes
     const activeUsers = await prisma.user.count({
       where: {
         lastActiveAt: {
-          gte: new Date(Date.now() - 10 * 60 * 1000)
+          gte: new Date(Date.now() - 30 * 60 * 1000) // 30 minutes ago
         }
       }
     });

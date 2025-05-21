@@ -1,3 +1,5 @@
+
+// types/globals.d.ts
 export {}
 
 // Create a type for the roles

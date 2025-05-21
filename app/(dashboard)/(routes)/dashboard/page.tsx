@@ -111,6 +111,32 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isAdmin) return;
 
+    // const loadAnalytics = async () => {
+    //   try {
+    //     // Load sales data
+    //     const { data: orders } = await axios.get("/api/orders");
+    //     const salesTotal = orders.reduce((acc: number, o: any) => acc + o.total, 0);
+    //     setTotalSales(Math.round(salesTotal));
+
+    //     const productSales: Record<string, number> = {};
+    //     orders.forEach((o: any) => {
+    //       JSON.parse(o.items).forEach((it: any) => {
+    //         productSales[it.model] = (productSales[it.model] || 0) + it.price * it.quantity;
+    //       });
+    //     });
+    //     setSalesData(Object.entries(productSales).map(([model, sales]) => ({
+    //       model,
+    //       sales: Number(sales.toFixed(2)),
+    //     })));
+
+    //     // Load active users
+    //     const { data: users } = await axios.get("/api/users/active");
+    //     setActiveUsers(users.count);
+    //   } catch (error) {
+    //     toast.error("Failed to load analytics data");
+    //   }
+    // };
+
     const loadAnalytics = async () => {
       try {
         // Load sales data
@@ -118,20 +144,15 @@ export default function DashboardPage() {
         const salesTotal = orders.reduce((acc: number, o: any) => acc + o.total, 0);
         setTotalSales(Math.round(salesTotal));
 
-        const productSales: Record<string, number> = {};
-        orders.forEach((o: any) => {
-          JSON.parse(o.items).forEach((it: any) => {
-            productSales[it.model] = (productSales[it.model] || 0) + it.price * it.quantity;
-          });
-        });
-        setSalesData(Object.entries(productSales).map(([model, sales]) => ({
-          model,
-          sales: Number(sales.toFixed(2)),
-        })));
-
         // Load active users
-        const { data: users } = await axios.get("/api/users/active");
-        setActiveUsers(users.count);
+        try {
+          const { data: users } = await axios.get("/api/users/active");
+          setActiveUsers(users.count);
+        } catch (error) {
+          console.error("Failed to load active users:", error);
+          setActiveUsers(0);
+        }
+
       } catch (error) {
         toast.error("Failed to load analytics data");
       }
@@ -171,17 +192,44 @@ export default function DashboardPage() {
   // };
 
   const handleDeleteCategory = async (categoryName: string) => {
-  try {
-    await axios.delete(`/api/categories/${categoryName}`);
-    await refreshCategories(); // Refresh categories list
-    await refresh(); // Refresh products list
-    toast.success("Category and related products deleted");
-  } catch (error) {
-    toast.error("Failed to delete category");
-  }
-};
+    try {
+      await axios.delete(`/api/categories/${categoryName}`);
+      await refreshCategories(); // Refresh categories list
+      await refresh(); // Refresh products list
+      toast.success("Category and related products deleted");
+    } catch (error) {
+      toast.error("Failed to delete category");
+    }
+  };
 
-  const handleAddProduct = async () => {
+  // const handleAddProduct = async () => {
+  //   try {
+  //   const { slug, model, price, image, description, category, specs } = newProduct;
+  //   if (!slug || !model || !price || !image || !description || !category) {
+  //     throw new Error("All fields are required");
+  //   }
+
+  //     const specsObj = Object.fromEntries(specs);
+  //     await addMachine({ slug, model, price: Number(price), image, description, category, specs: specsObj });
+
+  //     toast.success("Product added");
+  //     setProductDialogOpen(false);
+  //     setNewProduct({
+  //       slug: "",
+  //       model: "",
+  //       price: "",
+  //       image: "",
+  //       description: "",
+  //       category: categories[0]?.name || "",
+  //       specs: [],
+  //     });
+  //     await refresh();
+  //   } catch (error:any) {
+  //   toast.error(error.response?.data?.error || "Failed to add product");
+  // }
+  // };
+
+const handleAddProduct = async () => {
     try {
       const { slug, model, price, image, description, category, specs } = newProduct;
       if (!slug || !model || !price || !image || !description) {
@@ -209,7 +257,7 @@ export default function DashboardPage() {
   };
 
   return (
-     <div className="p-4 sm:p-6 space-y-6 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-6 min-h-screen">
       <Toaster richColors position="top-center" />
 
       {/* Main Content */}
@@ -225,7 +273,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-start sm:items-center mb-6 sm:mb-8"
         >
-          <h1 
+          <h1
             className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent"
             style={{ backgroundImage: colors.gradients.primary }}
           >
@@ -239,7 +287,7 @@ export default function DashboardPage() {
                 style={{ background: colors.gradients.primary }}
                 className="text-sm px-3 py-2 sm:px-4 sm:py-2"
               >
-                <Plus className="mr-1 sm:mr-2 h-4 w-4" /> 
+                <Plus className="mr-1 sm:mr-2 h-4 w-4" />
                 <span>Add Product</span>
               </Button>
               <Button
@@ -248,7 +296,7 @@ export default function DashboardPage() {
                 style={{ borderColor: colors.primary.main, color: colors.primary.main }}
                 className="text-sm px-3 py-2 sm:px-4 sm:py-2"
               >
-                <Plus className="mr-1 sm:mr-2 h-4 w-4" /> 
+                <Plus className="mr-1 sm:mr-2 h-4 w-4" />
                 <span>Manage Categories</span>
               </Button>
             </div>
@@ -280,7 +328,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Sales Chart */}
-       <motion.div
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-lg p-3 sm:p-4"
@@ -305,15 +353,15 @@ export default function DashboardPage() {
                     angle={-45}
                     textAnchor="end"
                     height={60}
-                    tick={{ 
+                    tick={{
                       fill: colors.text.secondary,
-                      fontSize: 10 
+                      fontSize: 10
                     }}
                   />
-                  <YAxis 
-                    tick={{ 
+                  <YAxis
+                    tick={{
                       fill: colors.text.secondary,
-                      fontSize: 10 
+                      fontSize: 10
                     }}
                   />
                   <Tooltip
@@ -339,7 +387,7 @@ export default function DashboardPage() {
 
       {/* Category Management Dialog */}
       <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-        <DialogContent 
+        <DialogContent
           className="max-w-[90vw] rounded-lg sm:rounded-xl"
           style={{ backgroundColor: colors.background.main }}
         >
@@ -348,7 +396,7 @@ export default function DashboardPage() {
               {editingCategory ? "Edit Category" : "Add New Category"}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm" style={{ color: colors.text.secondary }}>
@@ -366,18 +414,18 @@ export default function DashboardPage() {
               />
             </div>
 
-             <div className="space-y-3">
+            <div className="space-y-3">
               <Label className="text-sm" style={{ color: colors.text.secondary }}>
                 Existing Categories
               </Label>
               <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
                 {categories.map((category) => (
-                  <div 
+                  <div
                     key={category.name}
                     className="flex justify-between items-center p-2 rounded-md"
                     style={{ backgroundColor: colors.background.light }}
                   >
-                    <span 
+                    <span
                       className="text-sm truncate max-w-[120px] sm:max-w-none"
                       style={{ color: colors.text.primary }}
                     >
@@ -385,7 +433,7 @@ export default function DashboardPage() {
                     </span>
                     <div className="flex gap-1">
                       <Button
-                       className="text-sm h-8 px-3"
+                        className="text-sm h-8 px-3"
                         variant="ghost"
                         size="sm"
                         onClick={() => {
@@ -397,7 +445,7 @@ export default function DashboardPage() {
                         <Edit size={16} />
                       </Button>
                       <Button
-                       className="text-sm h-8 px-3"
+                        className="text-sm h-8 px-3"
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteCategory(category.name)}
@@ -420,7 +468,7 @@ export default function DashboardPage() {
                   setNewCategory("");
                 }}
                 style={{
-                   background: colors.primary.main,
+                  background: colors.primary.main,
                   borderColor: colors.background.dark,
                   color: colors.text.primary
                 }}
@@ -428,7 +476,7 @@ export default function DashboardPage() {
                 Cancel
               </Button>
               <Button
-               className="text-sm h-8 px-3"
+                className="text-sm h-8 px-3"
                 onClick={handleCategorySubmit}
                 style={{ background: colors.primary.main }}
               >
@@ -440,8 +488,8 @@ export default function DashboardPage() {
       </Dialog>
 
       {/* Add Product Dialog */}
-     <Dialog open={productDialogOpen} onOpenChange={setProductDialogOpen}>
-        <DialogContent 
+      <Dialog open={productDialogOpen} onOpenChange={setProductDialogOpen}>
+        <DialogContent
           className="max-w-[90vw] rounded-lg sm:rounded-xl"
           style={{ backgroundColor: colors.background.main }}
         >
@@ -453,7 +501,7 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             <div className="grid gap-3">
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label className="text-sm" style={{ color: colors.text.secondary }}>
                   Category
                 </Label>
@@ -470,6 +518,31 @@ export default function DashboardPage() {
                   {categories.map(c => (
                     <option key={c.name} value={c.name}>{c.name}</option>
                   ))}
+                </select>
+              </div> */}
+
+              <div className="space-y-1">
+                <Label className="text-sm" style={{ color: colors.text.secondary }}>
+                  Category
+                </Label>
+                <select
+                  className="w-full p-2 text-sm rounded-md"
+                  value={newProduct.category}
+                  onChange={(e) => setNewProduct(p => ({ ...p, category: e.target.value }))}
+                  style={{
+                    backgroundColor: colors.background.light,
+                    borderColor: colors.background.light,
+                    color: colors.text.primary
+                  }}
+                  required
+                >
+                  {categories.length === 0 ? (
+                    <option disabled value="">Create a category first</option>
+                  ) : (
+                    categories.map(c => (
+                      <option key={c.name} value={c.name}>{c.name}</option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -492,7 +565,7 @@ export default function DashboardPage() {
               ))}
             </div>
 
-             <div className="space-y-1">
+            <div className="space-y-1">
               <Label className="text-sm" style={{ color: colors.text.secondary }}>
                 Description
               </Label>
@@ -508,7 +581,7 @@ export default function DashboardPage() {
               />
             </div>
 
-          <div className="space-y-2">
+            <div className="space-y-2">
               <Label className="text-sm" style={{ color: colors.text.secondary }}>
                 Specifications
               </Label>
@@ -545,11 +618,11 @@ export default function DashboardPage() {
                 ))}
               </div>
               <Button
-               className="text-sm h-8 w-full"
+                className="text-sm h-8 w-full"
                 variant="outline"
                 onClick={() => setNewProduct(p => ({ ...p, specs: [...p.specs, ["", ""]] }))}
                 style={{
-                   background: colors.primary.main ,
+                  background: colors.primary.main,
                   borderColor: colors.background.light,
                   color: colors.text.primary
                 }}
@@ -558,12 +631,12 @@ export default function DashboardPage() {
               </Button>
             </div>
 
-             <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2">
               <Button
                 variant="outline"
                 onClick={() => setProductDialogOpen(false)}
                 style={{
-                   background: colors.primary.main ,
+                  background: colors.primary.main,
                   borderColor: colors.background.light,
                   color: colors.text.primary
                 }}

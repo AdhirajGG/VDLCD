@@ -25,6 +25,7 @@ export const colors = {
     active: "#334155",
     error: "#ef4444",
     success: "#22c55e",
+    warning: "#ffb300",
   },
   gradients: {
     primary: "linear-gradient(45deg, #6366f1 0%, #8b5cf6 100%)",

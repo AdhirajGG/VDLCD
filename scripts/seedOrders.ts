@@ -1,10 +1,10 @@
-// scripts/seedOrders.ts
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create test user
   const testUser = await prisma.user.upsert({
     where: { clerkId: 'user_2example123' },
     update: {},
@@ -14,6 +14,7 @@ async function main() {
     },
   });
 
+  // Create test order
   const order = await prisma.order.create({
     data: {
       id: uuidv4(),
@@ -35,7 +36,11 @@ async function main() {
           image: '/bulldozer.jpg'
         }
       ]),
-      createdAt: new Date()
+      paymentMethod: "Razorpay",
+      status: "COMPLETED",
+      razorpayOrderId: "order_123456789",
+      razorpayPaymentId: "pay_123456789",
+      razorpaySignature: "signature_123456789"
     }
   });
 

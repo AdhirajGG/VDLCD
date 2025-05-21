@@ -1,44 +1,18 @@
-//
-// import { NextResponse } from "next/server";
-// import prisma from "@/lib/prisma";
-// import { auth } from "@clerk/nextjs/server";
-
-// export async function GET() {
-//   const { userId } = await auth();
-  
-//   if (!userId) {
-//     return NextResponse.json([], { status: 200 });
-//   }
-
-//   try {
-//     const orders = await prisma.order.findMany({
-//       where: { userId },
-//       orderBy: { createdAt: 'desc' }
-//     });
-    
-//     return NextResponse.json(orders);
-//   } catch (error) {
-//     return NextResponse.json(
-//       { error: "Failed to fetch orders" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
 // app/api/orders/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getAuth } from "@clerk/nextjs/server";
+import { auth, getAuth } from "@clerk/nextjs/server";
+import { razorpay } from "@/lib/razorpay";
+import { useUser } from "@clerk/nextjs";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { userId } = getAuth(req as any);
-    
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find the user in your database using Clerk's userId
+    // Find the user in your DB
     const user = await prisma.user.findUnique({
       where: { clerkId: userId }
     });
@@ -49,27 +23,46 @@ export async function GET(req: Request) {
 
     const orders = await prisma.order.findMany({
       where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        total: true,
-        createdAt: true,
-        items: true,
-        paymentMethod: true
-      }
+      orderBy: { createdAt: "desc" }
     });
 
-    return NextResponse.json(orders.map(order => ({
+    // Ensure items is always an array
+    const safeOrders = orders.map(order => ({
       ...order,
-      createdAt: order.createdAt.toISOString(),
-      // Ensure items are properly parsed
-      items: typeof order.items === "string" ? JSON.parse(order.items) : order.items
-    })));
+      items: Array.isArray(order.items)
+        ? order.items
+        : typeof order.items === "string"
+          ? JSON.parse(order.items)
+          : []
+    }));
+
+    return NextResponse.json(safeOrders);
   } catch (error) {
     console.error("[ORDERS_GET]", error);
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
   }
 }
+
+
+// for future use if above fails
+// export async function GET(req: NextRequest) {
+//   try {
+//     const { userId } = getAuth(req);
+//     if (!userId) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//     }
+
+//     const orders = await prisma.order.findMany({
+//       where: { userId },
+//       orderBy: { createdAt: "desc" },
+//     });
+
+//     return NextResponse.json(orders);
+//   } catch (error) {
+//     console.error("[ORDERS_GET]", error);
+//     return NextResponse.json(
+//       { error: "Failed to fetch orders" },
+//       { status: 500 }
+//     );
+//   }
+// }

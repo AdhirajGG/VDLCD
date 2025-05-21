@@ -3,40 +3,41 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-export async function GET(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ items: [] });
-
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-    include: { cart: true }
-  });
-
-  return NextResponse.json({ items: user?.cart?.items || [] });
-}
-
-// export async function POST(req: NextRequest) {
+// export async function GET(req: NextRequest) {
 //   const { userId } = await auth();
-//   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//   if (!userId) return NextResponse.json({ items: [] });
 
-//   const { items } = await req.json();
-  
-//   await prisma.user.upsert({
+//   const user = await prisma.user.findUnique({
 //     where: { clerkId: userId },
-//     create: {
-//       clerkId: userId,
-//       cart: { create: { items } }
-//     },
-//     update: { 
-//       cart: { upsert: {
-//         create: { items },
-//         update: { items }
-//       }}
-//     }
+//     include: { cart: true }
 //   });
 
-//   return NextResponse.json({ success: true });
+//   return NextResponse.json({ items: user?.cart?.items || [] });
 // }
+
+
+// for future use if above fails
+export async function GET(req: NextRequest) {
+  try {
+    const { userId } = await auth();
+    if (!userId) return NextResponse.json({ items: [] });
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      include: { cart: true }
+    });
+
+    return NextResponse.json({ items: user?.cart?.items || [] });
+  } catch (error) {
+    console.error("[CART_GET]", error);
+    return NextResponse.json(
+      { error: "Failed to fetch cart" },
+      { status: 500 }
+    );
+  }
+}
+
+
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();

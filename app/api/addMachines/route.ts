@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
-    const machines = await prisma.machine.findMany({
+    const machines = await prisma.machine.findMany({  
       where: category ? { category } : undefined,
     });
     return NextResponse.json(machines, { status: 200 });
