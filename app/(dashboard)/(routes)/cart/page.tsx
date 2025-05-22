@@ -62,9 +62,35 @@ export default function CartPage() {
 //   }
 // };
 
+// const handleCheckout = async () => {
+//   try {
+   
+//     const { data: order } = await axios.post("/api/orders", {
+//       items: cartItems.map(item => ({
+//         slug: item.slug,
+//         model: item.model,
+//         price: Number(item.price),
+//         quantity: item.quantity,
+//         image: item.image
+//       })),
+//       total: Number(total.toFixed(2))
+//     });
+
+//      router.push(`/checkout/${order.id}`);
+//   } catch (error) {
+//     console.error("Checkout error:", error);
+//     toast.error("Failed to initiate checkout");
+//   }
+// };
+
 const handleCheckout = async () => {
   try {
-   
+    if (cartItems.length === 0) {
+      toast.warning("Your cart is empty");
+      return;
+    }
+
+    // Create order with all cart items
     const { data: order } = await axios.post("/api/orders", {
       items: cartItems.map(item => ({
         slug: item.slug,
@@ -73,10 +99,11 @@ const handleCheckout = async () => {
         quantity: item.quantity,
         image: item.image
       })),
-      total: Number(total.toFixed(2))
+      total: cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0)
     });
 
-     router.push(`/checkout/${order.id}`);
+    // Redirect to checkout page with order ID
+    router.push(`/checkout/${order.id}`);
   } catch (error) {
     console.error("Checkout error:", error);
     toast.error("Failed to initiate checkout");
@@ -230,7 +257,9 @@ const handleCheckout = async () => {
                   Clear Cart
                 </Button>
                 <Button
-                  onClick={handleCheckout}
+                  // onClick={handleCheckout}
+                  // onClick={()=> router.push(`/checkout/${encodeURIComponent(cartItems[].slug)}`)}
+                  onClick={() => router.push("/checkout/cart")}
                   style={{
                     backgroundColor: colors.primary.main,
                     color: colors.text.primary

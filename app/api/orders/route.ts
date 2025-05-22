@@ -163,53 +163,45 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const { userId } = getAuth(req);
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const { items, total } = await req.json();
     
-    // Add validation
-    if (!items || !total) {
+    // Validate input
+    if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Invalid cart items" },
         { status: 400 }
       );
     }
 
-       const orderItems = items.map((item: any) => ({
-            slug: item.slug,
-            model: item.model,
-            price: Number(item.price),
-            quantity: item.quantity,
-            image: item.image
-        }));
+    // Create Razorpay order
+    const razorpayOrder = await razorpay.orders.create({
+      amount: Math.round(total * 100), // Convert to paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`,
+    });
 
-        const razorpayOrder = await razorpay.orders.create({
-            amount: Math.round(total * 100),
-            currency: "INR",
-            receipt: `receipt_${Date.now()}`,
-        });
-const user = await prisma.user.upsert({
-            where: { clerkId: userId },
-            create: { clerkId: userId },
-            update: {}
-        });
-        // Fix: Stringify the order items
-        const order = await prisma.order.create({
-            data: {
-                total: Number(total.toFixed(2)),
-                userId: user.id,
-                items: JSON.stringify(orderItems), // Stringify here
-                razorpayOrderId: razorpayOrder.id,
-                status: "PENDING",
-                paymentMethod: "Razorpay"
-            }
-        });
+    // Create database order
+    const order = await prisma.order.create({
+      data: {
+        total: total,
+        userId,
+        items: JSON.stringify(items),
+        razorpayOrderId: razorpayOrder.id,
+        status: "PENDING",
+        paymentMethod: "Razorpay"
+      }
+    });
 
-        return NextResponse.json({
-            id: order.id,
-            razorpayOrderId: razorpayOrder.id,
-            amount: razorpayOrder.amount
-        })
+    return NextResponse.json({
+      id: order.id,
+      razorpayOrderId: razorpayOrder.id,
+      amount: razorpayOrder.amount
+    });
+
   } catch (error) {
     console.error("[ORDER_CREATION_ERROR]", error);
     return NextResponse.json(
