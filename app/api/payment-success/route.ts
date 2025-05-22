@@ -10,8 +10,8 @@ export async function POST(req: Request) {
       where: { id: orderId },
       data: {
         status: "COMPLETED",
-        paymentId,
-        orderId: razorpayOrderId
+        razorpayPaymentId:paymentId,
+        razorpayOrderId: razorpayOrderId
       }
     });
 

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
       return {
         price_data: {
-          currency: "usd",
+          currency: "inr",
           product_data: {
             name: product!.model,
           },

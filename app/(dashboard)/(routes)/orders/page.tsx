@@ -68,22 +68,37 @@ export default function OrdersPage() {
 const OrderPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
 
+  // useEffect(() => {
+  //   const fetchOrders = async () => {
+  //     try {
+  //       const { data } = await axios.get('/api/orders');
+  //       setOrders(data.map((order: any) => ({
+  //         ...order,
+  //         items: JSON.parse(order.items),
+  //         createdAt: new Date(order.createdAt).toLocaleDateString()
+  //       })));
+  //     } catch (error) {
+  //       console.error('Failed to fetch orders:', error);
+  //     }
+  //   };
+    
+  //   fetchOrders();
+  // }, []);}
   useEffect(() => {
     const fetchOrders = async () => {
-      try {
-        const { data } = await axios.get('/api/orders');
-        setOrders(data.map((order: any) => ({
-          ...order,
-          items: JSON.parse(order.items),
-          createdAt: new Date(order.createdAt).toLocaleDateString()
-        })));
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-      }
+        try {
+            const { data } = await axios.get('/api/orders');
+            setOrders(data.map((order: any) => ({
+                ...order,
+                items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items,
+                createdAt: new Date(order.createdAt).toLocaleDateString()
+            })));
+        } catch (error) {
+            console.error('Failed to fetch orders:', error);
+        }
     };
-    
     fetchOrders();
-  }, []);}
+}, []);}
 
   if (!isLoaded) {
     return (

@@ -335,7 +335,7 @@ const handleAddProduct = async () => {
           style={{ backgroundColor: colors.background.light }}
         >
           <h2 className="text-lg sm:text-xl font-semibold mb-3" style={{ color: colors.text.primary }}>
-            Sales Overview
+            Product Overview
           </h2>
           <div className="h-64 sm:h-80 w-full overflow-x-auto">
             <div className="min-w-[300px] sm:min-w-[600px] h-full">

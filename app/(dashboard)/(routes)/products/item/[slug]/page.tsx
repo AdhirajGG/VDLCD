@@ -495,7 +495,7 @@ export default function ProductDetailPage() {
                 </p>
               </div>
               {isAdmin && (
-                 <div className="flex gap-2">
+                 <div className="flex gap-2">     
                 <Button
                   variant="outline"
                   className="text-cyan-400 border-cyan-400 hover:bg-cyan-900/20"
@@ -560,6 +560,7 @@ export default function ProductDetailPage() {
                 backgroundColor: colors.background.dark,
                 color: colors.text.primary
               }}
+              onClick={()=> buyNowHandler()}
             >
               Buy Now
             </Button>

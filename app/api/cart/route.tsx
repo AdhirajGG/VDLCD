@@ -3,17 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-// export async function GET(req: NextRequest) {
-//   const { userId } = await auth();
-//   if (!userId) return NextResponse.json({ items: [] });
 
-//   const user = await prisma.user.findUnique({
-//     where: { clerkId: userId },
-//     include: { cart: true }
-//   });
-
-//   return NextResponse.json({ items: user?.cart?.items || [] });
-// }
 
 
 // for future use if above fails

@@ -26,15 +26,59 @@ export default function CartPage() {
     0
   );
 
-  const handleCheckout = async () => {
+//   const handleCheckout = async () => {
+//   try {
+//     const { data: order } = await axios.post("/api/orders", {
+//       items: cartItems,
+//       total: Number(total.toFixed(2))
+//     });
+
+//     router.push(`/checkout/${order.id}`);
+//   } catch (error) {
+//     toast.error("Failed to initiate checkout");
+//   }
+// };
+
+// const handleCheckout = async () => {
+//   try {
+//     // Convert cart items to proper format
+//     const checkoutItems = cartItems.map(item => ({
+//       slug: item.slug,
+//       model: item.model,
+//       price: Number(item.price),
+//       quantity: item.quantity,
+//       image: item.image
+//     }));
+
+//     const { data: order } = await axios.post("/api/orders", {
+//       items: checkoutItems,
+//       total: Number(total.toFixed(2))
+//     });
+
+//     router.push(`/checkout/${order.id}`);
+//   } catch (error) {
+//     console.error("Checkout error:", error);
+//     toast.error("Failed to initiate checkout");
+//   }
+// };
+
+const handleCheckout = async () => {
   try {
+   
     const { data: order } = await axios.post("/api/orders", {
-      items: cartItems,
+      items: cartItems.map(item => ({
+        slug: item.slug,
+        model: item.model,
+        price: Number(item.price),
+        quantity: item.quantity,
+        image: item.image
+      })),
       total: Number(total.toFixed(2))
     });
 
-    router.push(`/checkout/${order.id}`);
+     router.push(`/checkout/${order.id}`);
   } catch (error) {
+    console.error("Checkout error:", error);
     toast.error("Failed to initiate checkout");
   }
 };

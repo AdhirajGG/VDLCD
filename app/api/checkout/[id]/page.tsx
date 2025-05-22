@@ -25,11 +25,6 @@ interface OrderDetails {
   razorpayOrderId?: string;
 }
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 export default function UnifiedCheckoutPage() {
   const { id } = useParams();
@@ -149,7 +144,13 @@ export default function UnifiedCheckoutPage() {
         theme: { color: "#3B82F6" }
       };
 
-      const rzp = new window.Razorpay(options);
+      // Add a type definition for Razorpay to avoid TypeScript error
+      interface RazorpayInstance {
+        open: () => void;
+        // Add other methods if needed
+      }
+      // @ts-ignore: Ignore if Razorpay is not typed globally
+      const rzp: RazorpayInstance = new (window as any).Razorpay(options);
       rzp.open();
     } catch (error) {
       toast.error("Payment initiation failed");

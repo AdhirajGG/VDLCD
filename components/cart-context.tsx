@@ -4,7 +4,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
-
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 type CartItem = {
   slug: string;
   model: string;
@@ -28,7 +29,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoaded: userLoaded } = useUser();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [initialized, setInitialized] = useState(false);
-
+const router = useRouter();
   // Sync cart with backend
   // const syncCart = async (items: CartItem[]) => {
   //   if (user) {
@@ -47,8 +48,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 }, [user]);
+ const total = cartItems.reduce(
+    (sum, item) => sum + Number(item.price || 0) * (item.quantity || 1),
+    0
+  );
+const handleCheckout = async () => {
+  try {
+    const { data: order } = await axios.post("/api/orders", {
+      items: cartItems.map(item => ({
+        slug: item.slug,
+        model: item.model,
+        price: Number(item.price),
+        quantity: item.quantity,
+        image: item.image
+      })),
+      total: Number(total.toFixed(2))
+    });
 
-
+    router.push(`/checkout/${order.id}`);
+  } catch (error) {
+    console.error("Checkout error:", error);
+    toast.error("Failed to initiate checkout");
+  }
+};
   // Load cart on mount
   // useEffect(() => {
   //   const loadCart = async () => {
@@ -165,9 +187,9 @@ useEffect(() => {
     });
   }; 
 
-  const removeItemsBySlug = (slug: string) => {
-  setCartItems(prev => prev.filter(item => item.slug !== slug));
-}; 
+//   const removeItemsBySlug = (slug: string) => {
+//   setCartItems(prev => prev.filter(item => item.slug !== slug));
+// }; 
 
   const updateQuantity = (slug: string, quantity: number) => {
     setCartItems(prev => {
