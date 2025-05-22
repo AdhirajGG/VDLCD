@@ -28,23 +28,43 @@ import prisma from "@/lib/prisma";
 import { isAdmin } from "@/lib/clerkAdmin";
 
 // GET single machine
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+// export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+//   try {
+//     const machine = await prisma.machine.findUnique({
+//       where: { slug: params.slug },
+//     });
+
+//     if (!machine) {
+//       return NextResponse.json({ error: "Product not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json(machine, { status: 200 });
+//   } catch (error) {
+//     console.error("[MACHINE_GET]", error);
+//     return NextResponse.json(
+//       { error: "Failed to fetch product" }, 
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { slug: string } }
+) {
   try {
     const machine = await prisma.machine.findUnique({
       where: { slug: params.slug },
     });
 
     if (!machine) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    return NextResponse.json(machine, { status: 200 });
-  } catch (error) {
-    console.error("[MACHINE_GET]", error);
-    return NextResponse.json(
-      { error: "Failed to fetch product" }, 
-      { status: 500 }
-    );
+    return NextResponse.json(machine);
+  } catch (err) {
+    console.error("GET /api/machines/[slug] error:", err);
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
 
