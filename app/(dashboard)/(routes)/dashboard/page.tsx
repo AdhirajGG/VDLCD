@@ -257,21 +257,21 @@ const handleAddProduct = async () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-6 min-h-screen   ">
       <Toaster richColors position="top-center" />
 
       {/* Main Content */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-xl sm:rounded-3xl p-4 sm:p-6 shadow-lg"
+        className="rounded-xl sm:rounded-3xl p-4 sm:p-6 shadow-lg "
         style={{ background: colors.background.main }}
       >
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-start sm:items-center mb-6 sm:mb-8"
+          className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-start sm:items-center mb-6 sm:mb-8 "
         >
           <h1
             className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent"
@@ -331,36 +331,39 @@ const handleAddProduct = async () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg p-3 sm:p-4"
+          className="rounded-lg p-3 sm:p-4 "
           style={{ backgroundColor: colors.background.light }}
         >
           <h2 className="text-lg sm:text-xl font-semibold mb-3" style={{ color: colors.text.primary }}>
             Product Overview
           </h2>
-          <div className="h-64 sm:h-80 w-full overflow-x-auto">
-            <div className="min-w-[300px] sm:min-w-[600px] h-full">
-              <ResponsiveContainer width="100%" height="100%">
+          <div className="h-64 sm:h-80 w-full overflow-x-auto overflow-visible">
+            <div className="min-w-[300px] sm:min-w-[600px] h-full overflow-visible">
+              <ResponsiveContainer width="100%" height="100%" >
                 <RechartBarChart
                   data={salesData.length ? salesData : machines.map(m => ({
                     model: m.model,
                     sales: parseFloat(m.price.replace(/[^0-9.]/g, ""))
+                    
                   }))}
                   margin={{ right: 10, left: 10 }}
+                  
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke={colors.text.tertiary} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={colors.text.tertiary}
+                  />
                   <XAxis
                     dataKey="model"
                     angle={-45}
                     textAnchor="end"
                     height={60}
                     tick={{
-                      fill: colors.text.secondary,
+                      fill: colors.text.primary,
                       fontSize: 10
                     }}
                   />
                   <YAxis
                     tick={{
-                      fill: colors.text.secondary,
+                      fill: colors.text.primary,
                       fontSize: 10
                     }}
                   />

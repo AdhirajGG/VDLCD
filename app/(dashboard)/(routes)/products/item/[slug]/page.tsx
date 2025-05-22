@@ -89,7 +89,7 @@
 //       const specsObj = Object.fromEntries(editData.specs.filter(([k, v]) => k && v));
 //       await axios.put(`/api/machines/${slug}`, { ...editData, specs: specsObj });
 //       toast.success("Product updated!");
-      
+
 //       const { data } = await axios.get<Machine>(`/api/machines/${slug}`);
 //       setMachine(data);
 //       setEditData({
@@ -207,7 +207,7 @@
 //                   onChange={(e) => setEditData(d => ({ ...d, model: e.target.value }))}
 //                 />
 //               </div>
-              
+
 //               <div>
 //                 <Label>Price</Label>
 //                 <Input
@@ -319,7 +319,9 @@ type Machine = {
   category: string;
   specs: Record<string, string>;
 };
-
+type Category = {
+  name: string;
+};
 type EditFormData = {
   model: string;
   price: string;
@@ -337,7 +339,7 @@ export default function ProductDetailPage() {
   const { addToCart, removeFromCart } = useCart();
   const { user } = useUser();
   const isAdmin = user?.publicMetadata?.role === "admin";
-
+ const [categories, setCategories] = useState<{ name: string }[]>([]);
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState<EditFormData>({
     model: "",
@@ -369,6 +371,15 @@ export default function ProductDetailPage() {
         setLoading(false);
       }
     })();
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get('/api/categories');
+        setCategories(data);
+      } catch (error) {
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCategories();
   }, [slug, router]);
 
   const handleEditSpecChange = (index: number, field: number, value: string) => {
@@ -385,7 +396,7 @@ export default function ProductDetailPage() {
       const specsObj = Object.fromEntries(editData.specs.filter(([k, v]) => k && v));
       await axios.put(`/api/machines/${slug}`, { ...editData, specs: specsObj });
       toast.success("Product updated!");
-      
+
       const { data } = await axios.get<Machine>(`/api/machines/${slug}`);
       setMachine(data);
       setEditData({
@@ -403,45 +414,45 @@ export default function ProductDetailPage() {
     }
   };
 
-   const handleDeleteProduct = async () => {
-  try {
-    toast.custom((t) => (
-      <div className="bg-background-main p-4 rounded-lg shadow-xl border border-red-500/30"
-      style={{ background: colors.background.main }}
-      >
-        <h3 className="font-semibold mb-4" style={{ color: colors.text.primary }}>
-          Confirm Deletion
-        </h3>
-        <p className="mb-4" style={{ color: colors.text.secondary }}>
-          Are you sure you want to delete this product permanently?
-        </p>
-        <div className="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={() => toast.dismiss(t)}
-            style={{ color: colors.text.secondary }}
-          >
-            Cancel
-          </Button>
-          <Button
-            style={{ backgroundColor: colors.state.error }}
-            onClick={async () => {
-              await axios.delete(`/api/machines/${slug}`);
-              toast.dismiss(t);
-              removeFromCart(slug); // Remove from cart if present
-              toast.success("Product deleted successfully");
-              router.push("/dashboard");
-            }}
-          >
-            Delete
-          </Button>
+  const handleDeleteProduct = async () => {
+    try {
+      toast.custom((t) => (
+        <div className="bg-background-main p-4 rounded-lg shadow-xl border border-red-500/30"
+          style={{ background: colors.background.main }}
+        >
+          <h3 className="font-semibold mb-4" style={{ color: colors.text.primary }}>
+            Confirm Deletion
+          </h3>
+          <p className="mb-4" style={{ color: colors.text.secondary }}>
+            Are you sure you want to delete this product permanently?
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => toast.dismiss(t)}
+              style={{ color: colors.text.secondary }}
+            >
+              Cancel
+            </Button>
+            <Button
+              style={{ backgroundColor: colors.state.error }}
+              onClick={async () => {
+                await axios.delete(`/api/machines/${slug}`);
+                toast.dismiss(t);
+                removeFromCart(slug); // Remove from cart if present
+                toast.success("Product deleted successfully");
+                router.push("/dashboard");
+              }}
+            >
+              Delete
+            </Button>
+          </div>
         </div>
-      </div>
-    ));
-  } catch (error) {
-    toast.error("Failed to delete product");
-  }
-};
+      ));
+    } catch (error) {
+      toast.error("Failed to delete product");
+    }
+  };
 
   const addToCartHandler = () => {
     addToCart({
@@ -457,17 +468,17 @@ export default function ProductDetailPage() {
 
   if (loading) return <div className="container p-6"><Loading /></div>;
   if (!machine) return null;
-
+ 
   return (
-      <div className="container p-6 min-h-screen">
-      <div 
+    <div className="container p-6 min-h-screen">
+      <div
         className="rounded-3xl p-8 shadow-2xl"
         style={{ background: colors.background.main }}
       >
         {/* Image Section */}
-        <div 
+        <div
           className="relative aspect-square rounded-2xl overflow-hidden border-2 mb-8"
-          style={{ 
+          style={{
             borderColor: colors.primary.dark,
             backgroundColor: colors.background.dark
           }}
@@ -480,14 +491,14 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Details Section */}
-       <div className="space-y-8">
+        <div className="space-y-8">
           <div className="pb-6 border-b" style={{ borderColor: colors.primary.dark }}>
             <div className="flex justify-between items-start">
               <div>
                 <h1 className="text-4xl font-bold" style={{ color: colors.text.primary }}>
                   {machine.model}
                 </h1>
-                <p 
+                <p
                   className="text-2xl font-semibold bg-clip-text text-transparent mt-2"
                   style={{ backgroundImage: colors.gradients.primary }}
                 >
@@ -495,19 +506,19 @@ export default function ProductDetailPage() {
                 </p>
               </div>
               {isAdmin && (
-                 <div className="flex gap-2">     
-                <Button
-                  variant="outline"
-                  className="text-cyan-400 border-cyan-400 hover:bg-cyan-900/20"
-                  onClick={() => setEditOpen(true)}
-                >
-                  Edit Product
-                </Button>
-                <Button
+                <div className="flex gap-2">
+                  <Button
                     variant="outline"
-                    style={{ 
+                    className="text-cyan-400 border-cyan-400 hover:bg-cyan-900/20"
+                    onClick={() => setEditOpen(true)}
+                  >
+                    Edit Product
+                  </Button>
+                  <Button
+                    variant="outline"
+                    style={{
                       color: colors.state.error,
-                      borderColor: colors.state.error 
+                      borderColor: colors.state.error
                     }}
                     onClick={handleDeleteProduct}
                   >
@@ -523,15 +534,15 @@ export default function ProductDetailPage() {
           </p>
 
           {/* Specifications */}
-           <div 
+          <div
             className="rounded-xl p-6 border"
-            style={{ 
+            style={{
               backgroundColor: colors.background.light,
               borderColor: colors.primary.dark
             }}
           >
             <h2 className="text-xl font-semibold"
-            style={{ color: colors.text.primary }}
+              style={{ color: colors.text.primary }}
             >Technical Specifications</h2>
             <div className="space-y-4">
               {Object.entries(machine.specs).map(([key, value]) => (
@@ -544,10 +555,10 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Action Buttons */}
-         <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             <Button
               className="w-full h-14 text-lg"
-              style={{ 
+              style={{
                 backgroundColor: colors.primary.main,
                 color: colors.text.primary
               }}
@@ -556,11 +567,11 @@ export default function ProductDetailPage() {
             </Button>
             <Button
               className="w-full h-14 text-lg"
-              style={{ 
+              style={{
                 backgroundColor: colors.background.dark,
                 color: colors.text.primary
               }}
-              onClick={()=> buyNowHandler()}
+              onClick={() => buyNowHandler()}
             >
               Buy Now
             </Button>
@@ -570,7 +581,7 @@ export default function ProductDetailPage() {
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-         <DialogContent 
+        <DialogContent
           className="max-w-2xl max-h-[90vh] overflow-y-auto"
           style={{ background: colors.gradients.primary }}
         >
@@ -587,7 +598,7 @@ export default function ProductDetailPage() {
                   onChange={(e) => setEditData(d => ({ ...d, model: e.target.value }))}
                 />
               </div>
-              
+
               <div>
                 <Label>Price</Label>
                 <Input
@@ -618,11 +629,31 @@ export default function ProductDetailPage() {
               </div>
 
               <div className="col-span-full">
-                <Label>Category</Label>
-                <Input
+                <Label className="text-sm" style={{ color: colors.text.secondary }}>
+                  Category
+                </Label>
+                <select
+                  className="w-full p-2 text-sm rounded-md"
                   value={editData.category}
                   onChange={(e) => setEditData(d => ({ ...d, category: e.target.value }))}
-                />
+                  style={{
+                    backgroundColor: colors.background.light,
+                    borderColor: colors.background.light,
+                    color: colors.text.primary
+                  }}
+                  required
+                >
+                  {categories.length === 0 ? (
+                    <option disabled value="">Loading categories...</option>
+                  ) : (
+                    <>
+                      <option disabled value="">Select Category</option>
+                      {categories.map(c => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </>
+                  )}
+                </select>
               </div>
             </div>
 

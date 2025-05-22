@@ -412,7 +412,7 @@ export function BarChart({
     >
       <RechartsPrimitive.BarChart
         data={chartData}
-        margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
+        margin={{ top: 20, right: 30, left: 60, bottom: 100 }}
       >
         <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
         <RechartsPrimitive.XAxis 
