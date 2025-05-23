@@ -258,14 +258,14 @@ export default function CategoryProductsPage() {
       className="p-8 max-w-screen mx-auto min-h-screen"
     >
     <div className="rounded-3xl p-8 shadow-2xl"
-    style={{ background: colors.gradients.primary }}
+     style={{ background: colors.background.main }}
     >
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-bold mb-8 text-center"
         style={{
-          color: colors.background.light,
+          color: colors.text.primary,
 
         }}
       >
@@ -276,9 +276,9 @@ export default function CategoryProductsPage() {
         {filtered.map((product) => (
           <motion.div key={product.slug}>
             <Card
-              className="rounded-xl p-6 border transition-colors"
+              className="rounded-xl p-6 border transition-colors "
                   style={{
-                    backgroundColor: `${colors.background.light}30`,
+                    backgroundColor: `${colors.secondary.dark}`,
                     borderColor: `${colors.background.light}80`
                   }}
             >
@@ -322,7 +322,10 @@ export default function CategoryProductsPage() {
                     >
                       –
                     </Button>
-                    <span className="min-w-[2rem] text-center">
+                    <span className="min-w-[2rem] text-center rounded-4xl" style={{ backgroundImage: colors.gradients.primary,
+                        backgroundColor: colors.background.light,
+                        color: colors.text.primary
+                       }}>
                       {
                         cartItems.find((i) => i.slug === product.slug)
                           ?.quantity || 0
@@ -332,6 +335,9 @@ export default function CategoryProductsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleQuantityChange(product, 1)}
+                      style={{ background: colors.text.primary,
+                        
+                       }}
                     >
                       +
                     </Button>

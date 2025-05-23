@@ -8,7 +8,7 @@ export const colors = {
   secondary: {
     main: "#14b8a6",
     light: "#2dd4bf",
-    dark: "#0d9488",
+    dark: "#E3D5DF",
   },
   background: {
     main: "#0f172a",
