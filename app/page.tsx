@@ -191,7 +191,7 @@ export default function Landing() {
   const { isSignedIn } = useUser();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-950 to-slate-900 relative">
+    <div className="min-h-screen bg-gradient-to-b   from-indigo-950 to-slate-900 relative">
       {/* Auth Buttons */}
       <div className="absolute right-4 top-4 flex gap-3 z-50">
         {isSignedIn ? (

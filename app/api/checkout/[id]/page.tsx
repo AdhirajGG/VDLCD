@@ -397,10 +397,10 @@
 //     <div className="p-8 max-w-2xl mx-auto">
 //       <RazorpayScriptLoader />
 //       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
-      
+
 //       <div className="bg-white rounded-lg shadow p-6">
 //         <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-        
+
 //         {JSON.parse(order.items).map((item: PaymentItem) => (
 //           <div key={item.slug} className="flex justify-between items-center mb-4">
 //             <div className="flex items-center gap-4">
@@ -510,14 +510,21 @@ export default function CheckoutPage() {
         order_id: order.razorpayOrderId,
         handler: async (response: any) => {
           try {
+            // await axios.post("/api/payment/verify", {
+            //   razorpayPaymentId: response.razorpay_payment_id,
+            //   razorpayOrderId: response.razorpay_order_id,
+            //   razorpaySignature: response.razorpay_signature,
+            //   orderId: order.id
             await axios.post("/api/payment/verify", {
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpayOrderId: response.razorpay_order_id,
-              razorpaySignature: response.razorpay_signature,
-              orderId: order.id
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId: order.id,
             });
 
+
             clearCart();
+
             toast.success("Payment successful!");
             router.push("/orders");
           } catch (error) {
@@ -527,7 +534,11 @@ export default function CheckoutPage() {
         theme: { color: "#3B82F6" }
       };
 
-      const rzp = new window.Razorpay(options);
+      interface RazorpayInstance {
+        open: () => void;
+        // Add other methods if needed
+      }      // @ts-ignore: Ignore if Razorpay is not typed globally
+      const rzp: RazorpayInstance = new (window as any).Razorpay(options);
       rzp.open();
     } catch (error) {
       toast.error("Payment initiation failed");
@@ -553,10 +564,10 @@ export default function CheckoutPage() {
     <div className="p-8 max-w-2xl mx-auto">
       <RazorpayScriptLoader />
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
-      
+
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-        
+
         {items.map((item) => (
           <div key={item.slug} className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">

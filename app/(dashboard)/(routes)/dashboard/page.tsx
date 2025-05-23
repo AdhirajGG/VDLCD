@@ -398,9 +398,9 @@
 //                   setNewCategory("");
 //                 }}
 //                 style={{
-                  // background: colors.primary.main,
-                  // borderColor: colors.background.dark,
-                  // color: colors.text.primary
+// background: colors.primary.main,
+// borderColor: colors.background.dark,
+// color: colors.text.primary
 //                 }}
 //               >
 //                 Cancel
@@ -860,9 +860,11 @@ export default function DashboardPage() {
             <Label style={{ color: colors.text.secondary }}>Name</Label>
             <Input value={newCategory} onChange={e => setNewCategory(e.target.value)} style={{ backgroundColor: colors.background.light, borderColor: colors.background.light, color: colors.text.primary }} />
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setCategoryDialogOpen(false); setEditingCategory(null); setNewCategory(""); }} style={{ background: colors.state.error,
-                  borderColor: colors.background.dark,
-                  color: colors.text.primary }}>
+              <Button variant="outline" onClick={() => { setCategoryDialogOpen(false); setEditingCategory(null); setNewCategory(""); }} style={{
+                background: colors.state.error,
+                borderColor: colors.background.dark,
+                color: colors.text.primary
+              }}>
                 Cancel
               </Button>
               <Button onClick={handleCategorySubmit} style={{ background: colors.primary.main }}>Save</Button>
@@ -890,7 +892,7 @@ export default function DashboardPage() {
           </DialogHeader>
           <div className="space-y-4">
             {/* Category selector */}
-            <Label style={{ color: colors.text.secondary }}>Category</Label>
+            {/* <Label style={{ color: colors.text.secondary }}>Category</Label>
             <select
               value={newProduct.category}
               onChange={e => setNewProduct(p => ({ ...p, category: e.target.value }))}
@@ -900,6 +902,36 @@ export default function DashboardPage() {
               {categories.length
                 ? categories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)
                 : <option disabled value="">No categories</option>}
+            </select> */}
+            {/* Category selector */}
+            <Label style={{ color: colors.text.secondary }}>Category</Label>
+            <select
+              value={newProduct.category}
+              onChange={e => setNewProduct(p => ({ ...p, category: e.target.value }))}
+              required
+              className="w-full p-2 rounded-md"
+              style={{
+                backgroundColor: colors.background.light,
+                borderColor: colors.background.light,
+                color: colors.text.primary
+              }}
+            >
+              {categories.length > 0 ? (
+                <>
+                  <option disabled value="">
+                    Select Category
+                  </option>
+                  {categories.map(c => (
+                    <option key={c.name} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <option disabled value="">
+                  Loading categories...
+                </option>
+              )}
             </select>
             {/* Fields */}
             {["slug", "model", "price", "image"].map(f => (
@@ -947,9 +979,11 @@ export default function DashboardPage() {
             </div>
             {/* Actions */}
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setProductDialogOpen(false)} style={{  background: colors.state.error,
-                  borderColor: colors.background.dark,
-                  color: colors.text.primary }}>
+              <Button variant="outline" onClick={() => setProductDialogOpen(false)} style={{
+                background: colors.state.error,
+                borderColor: colors.background.dark,
+                color: colors.text.primary
+              }}>
                 Cancel
               </Button>
               <Button onClick={handleAddProduct} style={{ background: colors.primary.main }}>Add</Button>

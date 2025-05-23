@@ -26,63 +26,6 @@ export default function CartPage() {
     0
   );
 
-//   const handleCheckout = async () => {
-//   try {
-//     const { data: order } = await axios.post("/api/orders", {
-//       items: cartItems,
-//       total: Number(total.toFixed(2))
-//     });
-
-//     router.push(`/checkout/${order.id}`);
-//   } catch (error) {
-//     toast.error("Failed to initiate checkout");
-//   }
-// };
-
-// const handleCheckout = async () => {
-//   try {
-//     // Convert cart items to proper format
-//     const checkoutItems = cartItems.map(item => ({
-//       slug: item.slug,
-//       model: item.model,
-//       price: Number(item.price),
-//       quantity: item.quantity,
-//       image: item.image
-//     }));
-
-//     const { data: order } = await axios.post("/api/orders", {
-//       items: checkoutItems,
-//       total: Number(total.toFixed(2))
-//     });
-
-//     router.push(`/checkout/${order.id}`);
-//   } catch (error) {
-//     console.error("Checkout error:", error);
-//     toast.error("Failed to initiate checkout");
-//   }
-// };
-
-// const handleCheckout = async () => {
-//   try {
-   
-//     const { data: order } = await axios.post("/api/orders", {
-//       items: cartItems.map(item => ({
-//         slug: item.slug,
-//         model: item.model,
-//         price: Number(item.price),
-//         quantity: item.quantity,
-//         image: item.image
-//       })),
-//       total: Number(total.toFixed(2))
-//     });
-
-//      router.push(`/checkout/${order.id}`);
-//   } catch (error) {
-//     console.error("Checkout error:", error);
-//     toast.error("Failed to initiate checkout");
-//   }
-// };
-
 const handleCheckout = async () => {
   try {
     if (cartItems.length === 0) {
@@ -208,7 +151,7 @@ const handleCheckout = async () => {
                             className="text-sm sm:text-base" 
                             style={{ color: colors.text.secondary }}
                           >
-                            ${(Number(item.price) * item.quantity).toFixed(2)}
+                            Rs{(Number(item.price) * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       </div>
