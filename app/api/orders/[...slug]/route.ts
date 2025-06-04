@@ -1,11 +1,13 @@
-// app/api/orders/[...slug]/cancel/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { slug: string[] } }
-) {
+type Params = {
+  params: {
+    slug: string[];
+  };
+};
+
+export async function POST(req: NextRequest, context: Params) {
   const [id, action] = context.params.slug;
 
   if (action !== "cancel") {
