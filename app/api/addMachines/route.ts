@@ -19,17 +19,85 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST add a new machine (admin only)
+// // POST add a new machine (admin only)
+// export async function POST(req: NextRequest) {
+//   try {
+//     // Admin check
+//     if (!(await isAdmin())) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//     }
+
+//     const data = await req.json();
+//     const requiredFields = ["slug", "model", "price", "image", "description", "category", "specs"];
+//     const missingFields = requiredFields.filter(field => !data[field]);
+//     if (missingFields.length > 0) {
+//       return NextResponse.json(
+//         { error: `Missing required fields: ${missingFields.join(", ")}` },
+//         { status: 400 }
+//       );
+//     }
+
+//     // Convert specs safely
+//     let specsObject = {};
+//     if (Array.isArray(data.specs)) {
+//       specsObject = Object.fromEntries(
+//         data.specs.filter(([key, value]: [string, string]) => key && value)
+//       );
+//     } else {
+//       specsObject = data.specs;
+//     }
+
+//     // Check for existing slug
+//     const existingMachine = await prisma.machine.findUnique({
+//       where: { slug: data.slug },
+//     });
+//     if (existingMachine) {
+//       return NextResponse.json(
+//         { error: "Product with this slug already exists" },
+//         { status: 409 }
+//       );
+//     }
+
+//     // Create new machine
+//     const newMachine = await prisma.machine.create({
+//       data: {
+//         slug: data.slug.toLowerCase().replace(/\s+/g, '-'),
+//         model: data.model,
+//         price: data.price,
+//         image: data.image,
+//         description: data.description,
+//         category: data.category,
+//         specs: specsObject,
+//       },
+//     });
+
+//     return NextResponse.json(newMachine, { status: 201 });
+//   } catch (error: any) {
+//     console.error("[MACHINES_POST]", error);
+//     return NextResponse.json(
+//       { error: error.message || "Failed to add machine", details: error },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 export async function POST(req: NextRequest) {
   try {
-    // Admin check
     if (!(await isAdmin())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const data = await req.json();
-    const requiredFields = ["slug", "model", "price", "image", "description", "category", "specs"];
-    const missingFields = requiredFields.filter(field => !data[field]);
+    const requiredFields = [
+      "slug",
+      "model",
+      "price",
+      "image",
+      "description",
+      "category",
+      "specs",
+    ];
+    const missingFields = requiredFields.filter((field) => !data[field]);
     if (missingFields.length > 0) {
       return NextResponse.json(
         { error: `Missing required fields: ${missingFields.join(", ")}` },
@@ -37,17 +105,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert specs safely
-    let specsObject = {};
+    let specsObject: Record<string, any> = {};
+
+    // If specs is an array, verify it's array of 2-element arrays and convert
     if (Array.isArray(data.specs)) {
-      specsObject = Object.fromEntries(
-        data.specs.filter(([key, value]: [string, string]) => key && value)
+      const isValidSpecsArray = data.specs.every(
+        (item: [string, any]) =>
+          Array.isArray(item) &&
+          item.length === 2 &&
+          typeof item[0] === "string"
       );
-    } else {
+
+      if (!isValidSpecsArray) {
+        return NextResponse.json(
+          { error: "Invalid specs format" },
+          { status: 400 }
+        );
+      }
+
+      specsObject = Object.fromEntries(data.specs);
+    } else if (typeof data.specs === "object" && data.specs !== null) {
       specsObject = data.specs;
+    } else {
+      return NextResponse.json(
+        { error: "Invalid specs format" },
+        { status: 400 }
+      );
     }
 
-    // Check for existing slug
+    // Check if slug already exists
     const existingMachine = await prisma.machine.findUnique({
       where: { slug: data.slug },
     });
@@ -58,10 +144,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create new machine
+    // Create the new machine entry
     const newMachine = await prisma.machine.create({
       data: {
-        slug: data.slug.toLowerCase().replace(/\s+/g, '-'),
+        slug: data.slug.toLowerCase().replace(/\s+/g, "-"),
         model: data.model,
         price: data.price,
         image: data.image,
