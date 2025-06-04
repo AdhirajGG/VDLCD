@@ -13,16 +13,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.order.update({
+    // Try to update the order
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status: "CANCELLED" },
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[ORDER_CANCEL_ERROR]", error);
+    
+    // Handle specific error cases
+    if (error.code === "P2025") {
+      return NextResponse.json(
+        { error: "Order not found" }, 
+        { status: 404 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: "Failed to cancel order" }, 
+      { error: "Failed to cancel order: " + error.message }, 
       { status: 500 }
     );
   }
