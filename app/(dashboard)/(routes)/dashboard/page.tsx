@@ -679,7 +679,7 @@ export default function DashboardPage() {
           className="rounded-lg p-3 sm:p-4 mb-8"
           style={{ backgroundColor: colors.background.light }}
         >
-          <h2 className="text-lg sm:text-xl font-semibold mb-3" style={{ color: colors.text.primary }}>Product Sales</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-3" style={{ color: colors.text.primary }}>Product {isAdmin ? "Sales" : "Orders"} </h2>
           <div className="h-64 sm:h-80 w-full overflow-x-auto">
             <div className="min-w-[300px] sm:min-w-[600px] h-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -705,7 +705,7 @@ export default function DashboardPage() {
           className="rounded-lg p-3 sm:p-4"
           style={{ backgroundColor: colors.background.light }}
         >
-          <h2 className="text-lg sm:text-xl font-semibold mb-3" style={{ color: colors.text.primary }}>Last 6 Months Sales</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-3" style={{ color: colors.text.primary }}>Last 6 Months {isAdmin ? "Sales" : "Orders"}</h2>
           <div className="h-64 sm:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlySales} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
