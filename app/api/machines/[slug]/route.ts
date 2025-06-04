@@ -50,11 +50,13 @@ import prisma from "@/lib/prisma";
 import { isAdmin } from "@/lib/clerkAdmin";
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await context.params;
+
   try {
     const machine = await prisma.machine.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
     });
 
     if (!machine) {
@@ -67,6 +69,7 @@ export async function GET(
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
+
 
 // UPDATE machine
 export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
