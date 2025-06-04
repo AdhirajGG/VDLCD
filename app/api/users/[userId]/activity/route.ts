@@ -6,16 +6,15 @@ export async function PATCH(
   req: Request,
   { params }: { params: { userId: string } }
 ) {
+  const { userId } = params;
+
   try {
     await prisma.user.update({
-      where: { id: params.userId },
-      data: { lastActiveAt: new Date() }
+      where: { id: userId },
+      data: { lastActiveAt: new Date() },
     });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update activity" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update activity" }, { status: 500 });
   }
 }
