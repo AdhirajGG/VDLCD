@@ -4,21 +4,30 @@ import prisma from "@/lib/prisma";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { slug: string[] } } // Correct parameter typing
+  { params }: { params: { slug: string[] } }
 ) {
-  const [id, action] = params.slug;
-
-  if (action !== "cancel") {
-    return NextResponse.json(
-      { error: "Invalid action" },
-      { status: 400 }
-    );
-  }
-
   try {
+    // Ensure we have at least 2 parameters (id and action)
+    if (params.slug.length < 2) {
+      return NextResponse.json(
+        { error: "Invalid URL structure" },
+        { status: 400 }
+      );
+    }
+
+    const id = params.slug[0];
+    const action = params.slug[1];
+
+    if (action !== "cancel") {
+      return NextResponse.json(
+        { error: "Invalid action" },
+        { status: 400 }
+      );
+    }
+
     await prisma.order.update({
       where: { id },
-      data: { status: "CANCELLED" }, // Changed to more appropriate status
+      data: { status: "CANCELLED" },
     });
 
     return NextResponse.json({ success: true });
