@@ -2,10 +2,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-
+interface CartItem {
+  slug: string;
+  quantity: number;
+}
 export async function POST(req: NextRequest) {
   try {
-    const { items } = await req.json();
+    const { items } = await req.json()as { items: CartItem[] };;
     
     const lineItems = await Promise.all(items.map(async (item: any) => {
       const product = await prisma.machine.findUnique({

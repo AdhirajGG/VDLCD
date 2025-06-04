@@ -192,6 +192,8 @@ export default function ProductDetailPage() {
             src={machine.image}
             alt={machine.model}
             className="object-contain w-full h-full p-8"
+            width={800}
+            height={800}
           />
         </div>
 

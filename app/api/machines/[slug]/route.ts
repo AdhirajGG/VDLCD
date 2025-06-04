@@ -22,10 +22,7 @@
 //   }
 // }
 
-// app/api/machines/[slug]/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { isAdmin } from "@/lib/clerkAdmin";
+
 
 // GET single machine
 // export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
@@ -47,7 +44,10 @@ import { isAdmin } from "@/lib/clerkAdmin";
 //     );
 //   }
 // }
-
+// app/api/machines/[slug]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { isAdmin } from "@/lib/clerkAdmin";
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }

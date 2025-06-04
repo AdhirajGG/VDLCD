@@ -73,6 +73,8 @@ export default function Landing() {
             src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3"
             alt="Industrial Automation"
             className="w-full h-[500px] object-cover"
+            width={800}
+            height={800}
           />
         </motion.div>
       </header>

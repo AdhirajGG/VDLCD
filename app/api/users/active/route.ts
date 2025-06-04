@@ -11,6 +11,7 @@ export async function GET() {
           gte: new Date(Date.now() - 30 * 60 * 1000) // 30 minutes ago
         }
       }
+        
     });
     
     return NextResponse.json({ count: activeUsers });

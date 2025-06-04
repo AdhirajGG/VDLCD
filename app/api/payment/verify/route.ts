@@ -6,53 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import crypto from "crypto";
 
 
-// export async function POST(req: NextRequest) {
-//   try {
-//     const { razorpayOrderId, razorpayPaymentId, razorpaySignature, orderId } =
-//       await req.json();
 
-//     if (!razorpayOrderId ||
-//         !razorpayPaymentId ||
-//         !razorpaySignature ||
-//         !orderId
-//     ) {
-//       return NextResponse.json(
-//         { error: "Missing payment or orderId fields" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // compute signature:
-//     const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!);
-//     const digest = hmac
-//       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
-//       .digest("hex");
-
-//     if (digest !== razorpaySignature) {
-//       await prisma.order.update({
-//         where: { id: orderId },
-//         data: { status: "FAILED" },
-//       });
-//       return NextResponse.json(
-//         { error: "Invalid signature" },
-//         { status: 400 }
-//       );
-//     }
-
-//     await prisma.order.update({
-//       where: { id: orderId },
-//       data: { status: "COMPLETED" },
-//     });
-
-//     return NextResponse.json({ success: true });
-//   } catch (err) {
-//     console.error("[PAYMENT_VERIFY_ERROR]", err);
-//     return NextResponse.json(
-//       { error: "Verification failed" },
-//       { status: 500 }
-//     );
-//   }
-// }
 
 export async function POST(req: NextRequest) {
   try {

@@ -180,6 +180,8 @@ export default function OrdersPage() {
                               src={item.image}
                               alt={item.model}
                               className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-md"
+                              width={800}
+                               height={800}
                             />
                           )}
                           <div>

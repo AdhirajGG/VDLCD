@@ -51,65 +51,6 @@ export async function GET() {
   }
 }
 
-
-
-
-
-// export async function POST(req: NextRequest) {
-//   try {
-//     // 1) Authenticate
-//     const { userId: clerkId } = await auth();
-//     if (!clerkId) {
-//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-//     }
-
-//     // 2) Ensure we have an internal User to point at
-//     const user = await prisma.user.upsert({
-//       where:  { clerkId },
-//       create: { clerkId },
-//       update: {},
-//     });
-
-//     // 3) Parse & validate payload
-//     const { items, total } = await req.json();
-//     if (!Array.isArray(items) || items.length === 0) {
-//       return NextResponse.json({ error: "Empty cart" }, { status: 400 });
-//     }
-
-//     // 4) Create the Razorpay order
-//     const razorpayOrder = await razorpay.orders.create({
-//       amount:   Math.round(total * 100), // paise
-//       currency: "INR",
-//       receipt:  `receipt_${Date.now()}`,
-//     });
-
-//     // 5) Persist in your DB
-//     const order = await prisma.order.create({
-//       data: {
-//         total,
-//         userId:           user.id,
-//         items:            JSON.stringify(items),
-//         razorpayOrderId:  razorpayOrder.id,
-//         status:           "PENDING",
-//         paymentMethod:    "Razorpay",
-//       },
-//     });
-
-//     // 6) Return the basic Razorpay payload to your client
-//     return NextResponse.json({
-//       id:               order.id,
-//       razorpayOrderId:  razorpayOrder.id,
-//       amount:           razorpayOrder.amount,
-//     });
-//   } catch (err: any) {
-//     console.error("[ORDER_CREATION_ERROR]", err);
-//     return NextResponse.json(
-//       { error: err.message || "Failed to create order" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();

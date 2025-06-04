@@ -130,6 +130,8 @@ export default function CartPage() {
                         src={item.image}
                         alt={item.model}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-md"
+                        width={800}
+                         height={800}
                       />
                       <div className="flex-1 min-w-0">
                         <h3
