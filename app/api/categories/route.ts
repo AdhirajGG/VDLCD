@@ -38,8 +38,7 @@
 
 
 
-
-
+// app/api/categories/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { isAdmin } from "@/lib/clerkAdmin";
@@ -72,34 +71,5 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[CATEGORIES_POST]", error);
     return NextResponse.json({ error: "Failed to add category" }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    
-    await prisma.category.delete({
-      where: { id: Number(params.id) }
-    });
-    
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to delete category" }, { status: 500 });
-  }}
-  
-  export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    
-    const { name } = await req.json();
-    const updated = await prisma.category.update({
-      where: { id: Number(params.id) },
-      data: { name }
-    });
-    
-    return NextResponse.json(updated);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update category" }, { status: 500 });
   }
 }
