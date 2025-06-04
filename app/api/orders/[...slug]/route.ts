@@ -1,15 +1,19 @@
-// app/api/orders/[id]/cancel/route.ts
+// app/api/orders/[...slug]/cancel/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// Optional: use nodejs runtime if needed, but not required to fix this type error
-// export const runtime = "nodejs";
-
 export async function POST(
   req: NextRequest,
-  context: { params: Record<string, string> }
+  context: { params: { slug: string[] } }
 ) {
-  const { id } = context.params;
+  const [id, action] = context.params.slug;
+
+  if (action !== "cancel") {
+    return NextResponse.json(
+      { error: "Invalid action" },
+      { status: 400 }
+    );
+  }
 
   try {
     await prisma.order.update({
@@ -20,9 +24,6 @@ export async function POST(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[ORDER_CANCEL_ERROR]", error);
-    return NextResponse.json(
-      { error: "Failed to cancel order" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to cancel order" }, { status: 500 });
   }
 }
