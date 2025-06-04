@@ -269,7 +269,7 @@ export default function OrdersPage() {
                       <Button
                         onClick={async () => {
                           try {
-                            await axios.post(`/api/orders/${order.id}/cancel`);
+                            await axios.post(`/api/orders/cancel`);
                             setOrders(current =>
                               current.map(o =>
                                 o.id === order.id ? { ...o, status: "FAILED" } : o
