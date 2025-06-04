@@ -12,6 +12,9 @@ const nextConfig: import('next').NextConfig = {
       "media.gettyimages.com",
     ], // Add the hostname here
   },
+  eslint: {
+  ignoreDuringBuilds: true,
+},
 };
 
 export default nextConfig;

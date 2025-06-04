@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/lib/colors";
 import RazorpayScriptLoader from "@/components/RazorpayScriptLoader";
+import Image from "next/image";
 
 interface OrderItem {
   slug: string;
@@ -175,7 +176,7 @@ export default function OrdersPage() {
                       >
                         <div className="flex items-center gap-3">
                           {item.image && (
-                            <img
+                            <Image
                               src={item.image}
                               alt={item.model}
                               className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-md"

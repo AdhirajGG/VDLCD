@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import Loading from "../products/item/[slug]/loading";
 import { colors } from "@/lib/colors";
 import axios from "axios";
+import Image from "next/image";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, clearCart } = useCart();
@@ -26,32 +27,32 @@ export default function CartPage() {
     0
   );
 
-const handleCheckout = async () => {
-  try {
-    if (cartItems.length === 0) {
-      toast.warning("Your cart is empty");
-      return;
-    }
+  // const handleCheckout = async () => {
+  //   try {
+  //     if (cartItems.length === 0) {
+  //       toast.warning("Your cart is empty");
+  //       return;
+  //     }
 
-    // Create order with all cart items
-    const { data: order } = await axios.post("/api/orders", {
-      items: cartItems.map(item => ({
-        slug: item.slug,
-        model: item.model,
-        price: Number(item.price),
-        quantity: item.quantity,
-        image: item.image
-      })),
-      total: cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0)
-    });
+  //     // Create order with all cart items
+  //     const { data: order } = await axios.post("/api/orders", {
+  //       items: cartItems.map(item => ({
+  //         slug: item.slug,
+  //         model: item.model,
+  //         price: Number(item.price),
+  //         quantity: item.quantity,
+  //         image: item.image
+  //       })),
+  //       total: cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0)
+  //     });
 
-    // Redirect to checkout page with order ID
-    router.push(`/checkout/${order.id}`);
-  } catch (error) {
-    console.error("Checkout error:", error);
-    toast.error("Failed to initiate checkout");
-  }
-};
+  //     // Redirect to checkout page with order ID
+  //     router.push(`/checkout/${order.id}`);
+  //   } catch (error) {
+  //     console.error("Checkout error:", error);
+  //     toast.error("Failed to initiate checkout");
+  //   }
+  // };
 
   const handleRemoveItem = (slug: string) => {
     removeFromCart(slug);
@@ -125,14 +126,14 @@ const handleCheckout = async () => {
                 >
                   <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4">
                     <div className="flex items-center gap-3 sm:gap-4 w-full">
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.model}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-md"
                       />
                       <div className="flex-1 min-w-0">
-                        <h3 
-                          className="text-base sm:text-lg font-semibold truncate" 
+                        <h3
+                          className="text-base sm:text-lg font-semibold truncate"
                           style={{ color: colors.text.primary }}
                         >
                           {item.model}
@@ -147,8 +148,8 @@ const handleCheckout = async () => {
                           >
                             Qty: {item.quantity}
                           </Badge>
-                          <span 
-                            className="text-sm sm:text-base" 
+                          <span
+                            className="text-sm sm:text-base"
                             style={{ color: colors.text.secondary }}
                           >
                             Rs{(Number(item.price) * item.quantity).toFixed(2)}
