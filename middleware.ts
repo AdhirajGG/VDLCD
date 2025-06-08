@@ -29,9 +29,14 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // Public routes (anyone can hit these)
 const isPublicRoute = createRouteMatcher([
   "/",              // home
+  "/dashboard(.*)",       // dashboard and all dashboard routes
   "/sign-in(.*)",   // sign-in (and any nested paths)
   "/sign-up(.*)",   // sign-up
   "/cart(.*)",     // cart
+  "/products(.*)",        // all product routes
+  "/api/categories(.*)",  // categories API
+  "/api/machines(.*)",    // machines API
+  "/api/users/active",    // active users count
 ]);
 
 // Any routes you explicitly want Clerk to ignore entirely
@@ -40,15 +45,17 @@ const ignoredRoutes = [
 ];
 
 export default clerkMiddleware(async (auth, req) => {
+  const pathname = req.nextUrl.pathname;
   // If this is an ignored route, do nothing at all
   if (ignoredRoutes.some((route) => req.nextUrl.pathname.startsWith(route))) {
     return;
   }
 
   // Otherwise, if it’s not in your public list, enforce authentication
-  if (!isPublicRoute(req)) {
-    await auth.protect();
+  if (isPublicRoute(req)) {
+    return;
   }
+   await auth.protect();
 });
 
 export const config = {

@@ -8,38 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
+import LandingNavbar from "@/components/landing-navbar";
 
 export default function Landing() {
   const { isSignedIn } = useUser();
 
   return (
     <div className="min-h-screen bg-gradient-to-b   from-indigo-950 to-slate-900 relative">
-      {/* Auth Buttons */}
-      <div className="absolute right-4 top-4 flex gap-3 z-50">
-        {isSignedIn ? (
-          <Link href="/dashboard">
-            <Button className="rounded-full px-6 gap-2 bg-indigo-600 hover:bg-indigo-700">
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Button>
-          </Link>
-        ) : (
-          <>
-            <Link href="/sign-in">
-              <Button variant="outline" className="rounded-full px-6 gap-2 border-indigo-500 text-indigo-100 hover:bg-indigo-900/50">
-                <LogIn className="h-4 w-4" />
-                Login
-              </Button>
-            </Link>
-            <Link href="/sign-up">
-              <Button className="rounded-full px-6 gap-2 bg-indigo-600 hover:bg-indigo-700">
-                <UserPlus className="h-4 w-4" />
-                Register
-              </Button>
-            </Link>
-          </>
-        )}
-      </div>
+       <LandingNavbar />
 
       {/* Hero Section */}
       <header className="container mx-auto px-4 py-16 text-center">
