@@ -98,7 +98,7 @@ export default function LandingNavbar() {
                                 />
                             </div>
                             <span className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                                VDLCD
+                                Neko
                             </span>
                         </motion.div>
                     </Link>
